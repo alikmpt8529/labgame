@@ -29,7 +29,7 @@ function App() {
 
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if ((screen === 'game' || screen === 'level3') && event.key === 'h') {
+      if ((screen === 'level2' || screen === 'level3') && event.key === 'h') {
         setShowHelp(true);
       }
     };
@@ -41,7 +41,7 @@ function App() {
 
   // タイマー管理
   useEffect(() => {
-    if (screen === 'game') {
+    if (screen === 'level2') {
       if (timerIdRef.current) {
         clearInterval(timerIdRef.current);
       }
@@ -129,13 +129,13 @@ function App() {
   };
 
   useEffect(() => {
-    if (screen === 'game') {
+    if (screen === 'level2') {
       initializeQuestionSequence();
     }
   }, [screen]);
 
   useEffect(() => {
-    if (screen === 'game' && questionSequence.length > 0 && currentQuestionIndex < questionSequence.length) {
+    if (screen === 'level2' && questionSequence.length > 0 && currentQuestionIndex < questionSequence.length) {
       generateQuestion();
       setTimeRemaining(60);
     }
@@ -165,10 +165,10 @@ function App() {
   }
 
   const handleNavigation = (targetScreen) => {
-    if (targetScreen === 'game' && screen !== 'game') {
+    if (targetScreen === 'level2' && screen !== 'level2') {
       setInputValue('');
       setResult(null);
-    } else if (targetScreen !== 'game' && screen === 'game') {
+    } else if (targetScreen !== 'level2' && screen === 'level2') {
       if (timerIdRef.current) {
         clearInterval(timerIdRef.current);
       }

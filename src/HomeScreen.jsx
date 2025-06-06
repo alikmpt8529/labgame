@@ -27,7 +27,7 @@ function HomeScreen(props) {
         <button onClick={() => onNavigate('level1')} style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>
           Level 1
         </button>
-        <button onClick={() => onNavigate('game')} style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>
+        <button onClick={() => onNavigate('level2')} style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>
           Level 2
         </button>
         <button onClick={() => onNavigate('level3')} style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>
@@ -50,7 +50,7 @@ function HomeScreen(props) {
     );
   }
 
-  if (screen === 'game') {
+  if (screen === 'level2') {
     // ゲーム画面のUI
     const progressBarContainerStyle = {
       width: '100%',
@@ -103,7 +103,7 @@ function HomeScreen(props) {
           </div>
           <button onClick={() => onNavigate('home')} style={{ marginTop: '30px', padding: '10px 20px' }}>ホームに戻る</button>
         </div>
-        {showHelp && HelpPopup && <HelpPopup level="game" onClose={() => props.setShowHelp(false)} />}
+        {showHelp && HelpPopup && <HelpPopup level="level2" onClose={() => props.setShowHelp(false)} />}
       </>
     );
   }

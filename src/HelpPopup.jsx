@@ -3,7 +3,7 @@ import React from 'react';
 function HelpPopup({ onClose, level }) {
   let helpTextContent = "インド式計算法の一般的な説明です。"; // デフォルト
 
-  if (level === 'game') {
+  if (level === 'level2') {
     helpTextContent = 'ゲーム画面のヘルプ：ここではゲームのルールや操作方法について説明します。';
   } else if (level === 'level3') {
     helpTextContent = 'Level 3 のヘルプ：Level 3 の問題に関するヒントや解き方を説明します。';
