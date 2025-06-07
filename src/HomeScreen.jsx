@@ -20,20 +20,56 @@ function HomeScreen(props) {
     HelpPopup,
   } = props;
 
+  // ボタンのスタイル
+  const buttonStyle = {
+    margin: '10px',
+    padding: '10px 20px',
+    fontSize: '16px',
+    backgroundColor: '#f0f0f0',
+    border: '1px solid #ccc',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    transition: 'background-color 0.2s ease'
+  };
+
   if (screen === 'home') {
     return (
-      <div style={{ textAlign: 'center', marginTop: '100px' }}>
-        <h1>インド式計算ゲーム</h1>
-        <button onClick={() => onNavigate('level1')} style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>
-          Level 1
-        </button>
-        <button onClick={() => onNavigate('level2')} style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>
-          Level 2
-        </button>
-        <button onClick={() => onNavigate('level3')} style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>
-          Level 3
-        </button>
-      </div>
+      <>
+        <div style={{ textAlign: 'center', marginTop: '100px' }}>
+          <h1>インド式計算ゲーム</h1>
+          <button 
+            onClick={() => onNavigate('level1')} 
+            style={buttonStyle}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#d0d0d0'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = '#f0f0f0'}
+          >
+            Level 1
+          </button>
+          <button 
+            onClick={() => onNavigate('level2')} 
+            style={buttonStyle}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#d0d0d0'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = '#f0f0f0'}
+          >
+            Level 2
+          </button>
+          <button 
+            onClick={() => onNavigate('level3')} 
+            style={buttonStyle}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#d0d0d0'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = '#f0f0f0'}
+          >
+            Level 3
+          </button>
+        </div>
+        
+        {/* CSSスタイルを追加 */}
+        <style jsx>{`
+          button:hover {
+            background-color: #d0d0d0 !important;
+          }
+        `}</style>
+      </>
     );
   }
 
