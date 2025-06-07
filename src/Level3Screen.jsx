@@ -21,6 +21,7 @@ function Level3Screen({ onGoBack }) {
   const timerIdRef = useRef(null); // タイマーID保持用
   const [questionSequence, setQuestionSequence] = useState([]); // 問題の出題順序
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0); // 現在の問題番号
+  
   // ヘルプ表示のキーボードイベント処理
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -65,6 +66,7 @@ function Level3Screen({ onGoBack }) {
       }
     };
   }, [timeRemaining, onGoBack, currentQuestionIndex]);
+
   // 問題シーケンスの初期化
   const initializeQuestionSequence = () => {
     // 各問題タイプの出題数を定義
@@ -90,6 +92,7 @@ function Level3Screen({ onGoBack }) {
     setQuestionSequence(sequence);
     setCurrentQuestionIndex(0);
   };
+
   // 問題生成ロジック
   const generateQuestion = () => {
     // シーケンスの範囲外チェック
@@ -133,11 +136,13 @@ function Level3Screen({ onGoBack }) {
     setResult(null);
     setTimeRemaining(60); // タイマーリセット
   };
+
   // 副作用管理
   // コンポーネント初期化時に問題シーケンスを設定
   useEffect(() => {
     initializeQuestionSequence();
   }, []);
+
   // 問題インデックス変更時の処理
   useEffect(() => {
     if (questionSequence.length === 0) return;
@@ -154,6 +159,7 @@ function Level3Screen({ onGoBack }) {
       onGoBack();
     }
   }, [questionSequence, currentQuestionIndex, onGoBack]);
+
   // 回答チェック処理
   const checkAnswer = () => {
     // 数値が設定されていない場合は処理しない
@@ -174,6 +180,7 @@ function Level3Screen({ onGoBack }) {
       setResult('不正解');
     }
   };
+
   // ローディング状態の表示
   if (numA === null || numB === null && currentQuestionIndex < TOTAL_QUESTIONS) {
     return (
@@ -183,6 +190,7 @@ function Level3Screen({ onGoBack }) {
       </div>
     );
   }
+
   // メインUI表示
   return (
     <div style={{ textAlign: 'center', marginTop: '50px' }}>
@@ -198,9 +206,36 @@ function Level3Screen({ onGoBack }) {
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)' 
       }}>
         {/* 問題表示 */}
-        <p style={{ fontSize: '24px', fontWeight: 'bold', textAlign: 'center' }}>
-          問題: {numA} × {numB} = ?
-        </p>
+        <div style={{ 
+          fontSize: '24px', 
+          fontWeight: 'bold', 
+          textAlign: 'center',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          margin: '20px 0'
+        }}>
+          <span>問題: {numA} × {numB} = </span>
+          <input 
+            type="text" 
+            value={inputValue} 
+            onChange={e => setInputValue(e.target.value)} 
+            onKeyDown={e => { 
+              if (e.key === 'Enter') { 
+                checkAnswer(); 
+              } 
+            }} 
+            placeholder="答えを入力" 
+            style={{ 
+              padding: '10px', 
+              fontSize: '18px', 
+              width: '150px', 
+              borderRadius: '5px', 
+              border: '1px solid #ccc', 
+              marginLeft: '10px' 
+            }} 
+          />
+        </div>
         {/* 問題番号表示 */}
         <p style={{ textAlign: 'center' }}>問題 {currentQuestionIndex + 1} / {TOTAL_QUESTIONS}</p>
         {/* タイマー表示 */}
@@ -223,40 +258,15 @@ function Level3Screen({ onGoBack }) {
             }}></div>
           </div>
         </div>
-        {/* 入力・回答エリア */}
+        {/* 結果表示エリア */}
         <div style={{ marginTop: '20px', textAlign: 'center' }}>
-          {/* 回答入力フィールド */}
-          <input 
-            type="text" 
-            value={inputValue} 
-            onChange={e => setInputValue(e.target.value)} 
-            onKeyDown={e => { 
-              if (e.key === 'Enter') { 
-                checkAnswer(); 
-              } 
-            }} 
-            placeholder="答えを入力" 
-            style={{ 
-              padding: '10px', 
-              fontSize: '18px', 
-              width: '150px', 
-              borderRadius: '5px', 
-              border: '1px solid #ccc', 
-              marginRight: '10px' 
-            }} 
-          />
-          {/* 回答ボタン */}
-          <button 
-            onClick={checkAnswer} 
-            style={{ padding: '10px 15px', fontSize: '18px' }}
-          >回答</button>
           {/* 結果表示 */}
           {result && (
             <p style={{ 
               marginTop: '15px', 
               fontSize: '20px', 
               fontWeight: 'bold', 
-              color: result === '正解！' ? '#4caf50' : '#f44336' 
+              color: result === '正解！' ? 'red' : 'blue' // 正解は赤色、不正解は青色
             }}>{result}</p>
           )}
           {/* ヘルプヒント */}
@@ -268,7 +278,7 @@ function Level3Screen({ onGoBack }) {
       <button 
         onClick={onGoBack} 
         style={{ marginTop: '30px', padding: '10px 20px' }}
-      >ホームに戻る</button>
+      >リタイア</button>
     </div>
   );
 }
