@@ -22,6 +22,7 @@ function App() {
   const [result, setResult] = useState(null)
   const [showHelp, setShowHelp] = useState(false)
   const [timeRemaining, setTimeRemaining] = useState(60)
+  const [timeSpent, setTimeSpent] = useState(0);　//経過時間（秒）
   const timerIdRef = useRef(null)
 
   const [questionSequence, setQuestionSequence] = useState([]);
@@ -147,12 +148,15 @@ function App() {
     if (parseInt(inputValue, 10) === answer) {
       setResult('正解！')
       const nextQuestionIndex = currentQuestionIndex + 1;
+      // 経過時間を更新
+      setTimeSpent(timeSpent + (60 - timeRemaining));
       setCount(nextQuestionIndex);
 
       if (nextQuestionIndex >= questionSequence.length) {
         setTimeout(() => {
-          setScreen('home')
-          alert('全問正解！おめでとうございます！');
+          alert('クリア時間' + timeSpent + '秒');
+          // 結果画面に遷移
+          setScreen('result');
         }, 1000)
       } else {
         setTimeout(() => {
