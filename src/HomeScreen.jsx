@@ -1,6 +1,7 @@
 import React from 'react';
 import Level1Screen from './Level1Screen'; // Level1Screenコンポーネントをインポート
 import Level3Screen from './Level3Screen'; // Level3Screenコンポーネントをインポート
+import ResultPage from './ResultPage'; // ResultPageコンポーネントをインポート
 
 function HomeScreen(props) {
   const {
@@ -44,7 +45,7 @@ function HomeScreen(props) {
   if (screen === 'level3') {
     return (
       <>
-        <Level3Screen onGoBack={() => onNavigate('home')} />
+        <Level3Screen onGoBack={() => onNavigate('home')} onGoForward={() => onNavigate('result')} />
         {showHelp && HelpPopup && <HelpPopup level="level3" onClose={() => props.setShowHelp(false)} />}
       </>
     );
@@ -106,6 +107,10 @@ function HomeScreen(props) {
         {showHelp && HelpPopup && <HelpPopup level="level2" onClose={() => props.setShowHelp(false)} />}
       </>
     );
+  }
+
+  if (screen === 'result') {
+    return <ResultPage onGoBack={() => onNavigate('home')} />;
   }
 
   return null; // 通常は到達しない
