@@ -19,6 +19,7 @@ function App() {
   const [resultColor, setResultColor] = useState('black')
   const [showHelp, setShowHelp] = useState(false)
   const [timeRemaining, setTimeRemaining] = useState(60)
+  const [timeSpent, setTimeSpent] = useState(0);　//経過時間（秒）
   const timerIdRef = useRef(null)
   const [questionSequence, setQuestionSequence] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -154,13 +155,16 @@ function App() {
       setResult('正解！')
       setResultColor('red')
       const nextQuestionIndex = currentQuestionIndex + 1;
+      // 経過時間を更新
+      setTimeSpent(timeSpent + (60 - timeRemaining));
       setCount(nextQuestionIndex);
 
       if (nextQuestionIndex >= questionSequence.length) {
         setGameEnded(true); // ゲーム終了フラグを設定
         setTimeout(() => {
-          setScreen('home')
-          alert('全問正解！おめでとうございます！');
+          alert('クリア時間' + timeSpent + '秒');
+          // 結果画面に遷移
+          setScreen('result');
         }, 1000)
       } else {
         setTimeout(() => {

@@ -10,7 +10,7 @@ const TOTAL_QUESTIONS = 5; // 問題の総数
  * 
  * @param {Function} onGoBack - ホーム画面に戻るためのコールバック関数
  */
-function Level3Screen({ onGoBack }) {
+function Level3Screen({ onGoBack, onGoForward }) {
   // ステート管理
   const [inputValue, setInputValue] = useState(''); // ユーザーの入力値
   const [numA, setNumA] = useState(null); // 問題の第一の数値
@@ -18,6 +18,7 @@ function Level3Screen({ onGoBack }) {
   const [result, setResult] = useState(null); // 回答結果（正解/不正解）
   const [showHelp, setShowHelp] = useState(false); // ヘルプ表示フラグ
   const [timeRemaining, setTimeRemaining] = useState(60); // 残り時間（秒）
+  const [timeSpent, setTimeSpent] = useState(0);　//経過時間（秒）
   const timerIdRef = useRef(null); // タイマーID保持用
   const [questionSequence, setQuestionSequence] = useState([]); // 問題の出題順序
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0); // 現在の問題番号
@@ -155,8 +156,10 @@ function Level3Screen({ onGoBack }) {
       if (timerIdRef.current) {
         clearInterval(timerIdRef.current);
       }
-      alert('全問終了！おめでとうございます！');
-      onGoBack();
+      alert('クリア時間' + timeSpent + '秒');
+      /*onGoBack();*/
+      // 結果画面に遷移
+      onGoForward();
     }
   }, [questionSequence, currentQuestionIndex, onGoBack]);
 
@@ -170,6 +173,8 @@ function Level3Screen({ onGoBack }) {
       // 正解の場合
       setResult('正解！');
       const nextQuestionIndex = currentQuestionIndex + 1;
+      // 経過時間を更新
+      setTimeSpent(timeSpent + (60 - timeRemaining));
       
       // 1秒後に次の問題へ進む
       setTimeout(() => {
