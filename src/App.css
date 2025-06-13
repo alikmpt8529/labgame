@@ -40,3 +40,327 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Level2 入力欄のスタイル */
+.level2-input {
+  border: 1px solid #ccc;
+  background-color: #ffffff;
+  color: #000000;
+}
+
+/* Level2 入力欄（無効時）のスタイル */
+.level2-input-disabled {
+  background-color: #f5f5f5;
+  color: #666666;
+}
+
+/* Level2 入力欄のプレースホルダー */
+.level2-input::placeholder {
+  color: #999999;
+  opacity: 1;
+}
+
+.level2-input::-webkit-input-placeholder {
+  color: #999999;
+}
+
+.level2-input::-moz-placeholder {
+  color: #999999;
+  opacity: 1;
+}
+
+.level2-input:-ms-input-placeholder {
+  color: #999999;
+}
+
+.level2-input:-moz-placeholder {
+  color: #999999;
+  opacity: 1;
+}
+
+/* Level2 入力欄のフォーカス時 */
+.level2-input:focus {
+  border-color: #007acc;
+  box-shadow: 0 0 5px rgba(0, 122, 204, 0.3);
+}
+
+/* レスポンシブデザイン用のスタイル */
+.game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  padding: clamp(10px, 3vw, 20px);
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.game-title {
+  font-size: clamp(20px, 5vw, 32px);
+  margin-bottom: clamp(15px, 3vw, 25px);
+  font-weight: bold;
+}
+
+.game-main-content {
+  width: 100%;
+  max-width: 600px;
+  margin: clamp(10px, 2vw, 20px) auto;
+  padding: clamp(15px, 3vw, 20px);
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.game-question {
+  font-size: clamp(16px, 4vw, 24px);
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: clamp(15px, 3vw, 20px);
+  word-wrap: break-word;
+  line-height: 1.4;
+}
+
+.game-input {
+  padding: clamp(8px, 2vw, 10px);
+  font-size: clamp(14px, 3vw, 18px);
+  width: clamp(100px, 25vw, 150px);
+  max-width: 200px;
+  border-radius: 5px;
+  margin: clamp(5px, 1vw, 10px);
+  outline: none;
+  box-sizing: border-box;
+}
+
+.game-counter,
+.game-timer {
+  font-size: clamp(14px, 3vw, 16px);
+  text-align: center;
+  margin: clamp(8px, 2vw, 10px) 0;
+}
+
+.game-progress-container {
+  width: 100%;
+  height: clamp(15px, 3vw, 20px);
+  border-radius: 10px;
+  overflow: hidden;
+  margin: clamp(10px, 2vw, 15px) 0 clamp(15px, 3vw, 20px) 0;
+}
+
+.game-result {
+  margin-top: clamp(10px, 2vw, 15px);
+  font-size: clamp(16px, 4vw, 20px);
+  font-weight: bold;
+  text-align: center;
+}
+
+.game-hint {
+  font-size: clamp(11px, 2.5vw, 14px);
+  text-align: center;
+  margin-top: clamp(15px, 3vw, 20px);
+  line-height: 1.3;
+}
+
+.game-button {
+  padding: clamp(8px, 2vw, 10px) clamp(15px, 3vw, 20px);
+  font-size: clamp(14px, 3vw, 18px);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: clamp(5px, 1vw, 10px);
+  min-width: clamp(60px, 15vw, 80px);
+}
+
+.game-retry-button {
+    background-color: #555555 !important;
+    color: #cccccc !important;
+  }
+
+.level2-input::placeholder,
+.level3-input::placeholder {
+  color: #aaaaaa !important;
+}
+
+/* Level2とLevel3共通の入力欄スタイル */
+.level2-input,
+.level3-input {
+  border: 1px solid #666666;
+  background-color: #2d2d30;
+  color: #ffffff;
+}
+
+/* Level2とLevel3共通の入力欄（無効時）のスタイル */
+.level2-input-disabled,
+.level3-input-disabled {
+  background-color: #555555;
+  color: #cccccc;
+}
+
+/* Level2とLevel3共通の入力欄のプレースホルダー */
+.level2-input::placeholder,
+.level3-input::placeholder {
+  color: #aaaaaa;
+  opacity: 1;
+}
+
+.level2-input::-webkit-input-placeholder,
+.level3-input::-webkit-input-placeholder {
+  color: #aaaaaa;
+}
+
+.level2-input::-moz-placeholder,
+.level3-input::-moz-placeholder {
+  color: #aaaaaa;
+  opacity: 1;
+}
+
+.level2-input:-ms-input-placeholder,
+.level3-input:-ms-input-placeholder {
+  color: #aaaaaa;
+}
+
+.level2-input:-moz-placeholder,
+.level3-input:-moz-placeholder {
+  color: #aaaaaa;
+  opacity: 1;
+}
+
+/* Level2とLevel3共通の入力欄のフォーカス時 */
+.level2-input:focus,
+.level3-input:focus {
+  border-color: #007acc;
+  box-shadow: 0 0 5px rgba(0, 122, 204, 0.5);
+}
+
+/* Level2とLevel3共通の入力欄のホバー時 */
+.level2-input:hover:not(.level2-input-disabled),
+.level3-input:hover:not(.level3-input-disabled) {
+  border-color: #888888;
+  transition: border-color 0.2s ease;
+}
+
+/* Level2とLevel3共通の時間表示スタイル */
+.level2-timer,
+.level3-timer {
+  color: #ffffff;
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+/* Level2とLevel3共通の時間表示（ヘルプ表示中）スタイル */
+.level2-timer.help-active,
+.level3-timer.help-active {
+  color: #ff6b6b;
+}
+
+/* Level2とLevel3共通の問題文スタイル */
+.level2-question,
+.level3-question {
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Level2とLevel3共通の問題カウンタースタイル */
+.level2-counter,
+.level3-counter {
+  color: #ffffff;
+  text-align: center;
+}
+
+/* ライトモード用のスタイル */
+@media (prefers-color-scheme: light) {
+  /* Level2とLevel3のテキスト要素（ライトモード） */
+  .level2-timer,
+  .level3-timer,
+  .level2-question,
+  .level3-question,
+  .level2-counter,
+  .level3-counter {
+    color: #000000 !important; /* 黒文字 */
+  }
+
+  /* ヘルプ表示中はライトモードでも赤色を維持 */
+  .level2-timer.help-active,
+  .level3-timer.help-active {
+    color: #d32f2f !important; /* 濃い赤 */
+  }
+
+  /* Level2とLevel3の入力欄（ライトモード） */
+  .level2-input,
+  .level3-input {
+    border: 1px solid #cccccc !important;
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* Level2とLevel3の入力欄（無効時・ライトモード） */
+  .level2-input-disabled,
+  .level3-input-disabled {
+    background-color: #f5f5f5 !important;
+    color: #666666 !important;
+  }
+
+  /* プレースホルダー（ライトモード） */
+  .level2-input::placeholder,
+  .level3-input::placeholder {
+    color: #999999 !important;
+  }
+
+  .level2-input::-webkit-input-placeholder,
+  .level3-input::-webkit-input-placeholder {
+    color: #999999 !important;
+  }
+
+  .level2-input::-moz-placeholder,
+  .level3-input::-moz-placeholder {
+    color: #999999 !important;
+  }
+
+  .level2-input:-ms-input-placeholder,
+  .level3-input:-ms-input-placeholder {
+    color: #999999 !important;
+  }
+
+  /* フォーカス時（ライトモード） */
+  .level2-input:focus,
+  .level3-input:focus {
+    border-color: #007acc !important;
+    box-shadow: 0 0 5px rgba(0, 122, 204, 0.3) !important;
+  }
+}
+
+/* ダークモード用のスタイル（明示的に指定） */
+@media (prefers-color-scheme: dark) {
+  .level2-timer,
+  .level3-timer,
+  .level2-question,
+  .level3-question,
+  .level2-counter,
+  .level3-counter {
+    color: #ffffff !important; /* 白文字 */
+  }
+
+  .level2-timer.help-active,
+  .level3-timer.help-active {
+    color: #ff6b6b !important; /* 明るい赤 */
+  }
+
+  .level2-input,
+  .level3-input {
+    border: 1px solid #666666 !important;
+    background-color: #2d2d30 !important;
+    color: #ffffff !important;
+  }
+
+  .level2-input-disabled,
+  .level3-input-disabled {
+    background-color: #555555 !important;
+    color: #cccccc !important;
+  }
+
+  .level2-input::placeholder,
+  .level3-input::placeholder {
+    color: #aaaaaa !important;
+  }
+}

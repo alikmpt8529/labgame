@@ -5,9 +5,184 @@ import HomeScreen from './HomeScreen'; // HomeScreenコンポーネントをイ�
 import OriginalHelpPopup from './HelpPopup'; // HelpPopupコンポーネントをインポート（名前を変更）
 
 // 問題タイプ定数
-const QUESTION_TYPE_SAME_UNITS_TENS_SUM_10 = 'SAME_UNITS_TENS_SUM_10'; // 一の位が同じ、十の位の和が10
 const QUESTION_TYPE_SAME_TENS_DIFFERENT_UNITS = 'SAME_TENS_DIFFERENT_UNITS'; // 十の位が同じ、一の位が異なる
+const QUESTION_TYPE_UNITS_SAME_TENS_SUM_10 = 'UNITS_SAME_TENS_SUM_10'; // 一の位が同じ、十の位の和が10
 
+// Level2画面コンポーネント
+function Level2Screen({
+  num4,
+  num5,
+  count,
+  timeRemaining,
+  progressTime,
+  inputValue,
+  setInputValue,
+  checkAnswer,
+  result,
+  showHelp,
+  setShowHelp,
+  onGoBack,
+  HelpPopup
+}) {
+  // システムの色設定を検出
+  const [isDarkMode, setIsDarkMode] = useState(
+    window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+  );
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e) => setIsDarkMode(e.matches);
+    
+    mediaQuery.addListener(handleChange);
+    return () => mediaQuery.removeListener(handleChange);
+  }, []);
+
+  // Level2用の入力制御関数
+  const handleLevel2InputChange = (e) => {
+    const value = e.target.value;
+    // 数字のみを許可（空文字も許可）
+    if (value === '' || /^\d+$/.test(value)) {
+      setInputValue(value);
+    }
+  };
+
+  // Level2用のキーボード入力処理
+  const handleLevel2KeyDown = (e) => {
+    if (e.key === 'Enter' && inputValue.trim() !== '') {
+      checkAnswer();
+    }
+    // 数字、Backspace、Delete、Arrow keys、Tabのみ許可
+    if (!/[\d]/.test(e.key) && 
+        !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter'].includes(e.key)) {
+      e.preventDefault();
+    }
+  };
+
+  // Level3と同じプログレスバースタイル
+  const progressBarContainerStyle = {
+    width: '100%',
+    height: '20px',
+    backgroundColor: '#e0e0e0',
+    borderRadius: '10px',
+    overflow: 'hidden', 
+    margin: '10px 0 20px 0' 
+  };
+
+  const progressBarStyle = {
+    height: '100%',
+    width: `${(progressTime / 60) * 100}%`,
+    backgroundColor: progressTime > 10 ? '#4caf50' : '#f44336', 
+    transition: 'width 0.1s linear' // Level3の滑らかな更新を維持
+  };
+
+  return (
+    <>
+      <div style={{ 
+        textAlign: 'center', 
+        marginTop: '50px',
+        color: isDarkMode ? '#ffffff' : '#000000',
+        backgroundColor: isDarkMode ? '#2d2d30' : '#ffffff',
+        minHeight: '100vh',
+        padding: '20px'
+      }}>
+        <h1 style={{ color: isDarkMode ? '#ffffff' : '#000000' }}>
+          level2
+        </h1>
+        <div style={{ 
+          maxWidth: '600px', 
+          margin: '20px auto', 
+          padding: '20px', 
+          border: isDarkMode ? '1px solid #555555' : '1px solid #cccccc',
+          borderRadius: '8px', 
+          boxShadow: isDarkMode 
+            ? '0 2px 4px rgba(0,0,0,0.3)' 
+            : '0 2px 4px rgba(0,0,0,0.1)',
+          backgroundColor: isDarkMode ? '#3c3c3c' : '#ffffff'
+        }}>
+          {/* 問題表示 */}
+          <p className={`level2-question ${isDarkMode ? 'dark-theme' : 'light-theme'}`}>
+            問題(Question): {num4} × {num5} = 
+            <input 
+              type="text" 
+              value={inputValue} 
+              onChange={handleLevel2InputChange}
+              onKeyDown={handleLevel2KeyDown}
+              placeholder="答えを入力" 
+              disabled={showHelp}
+              autoFocus={!showHelp}
+              className={`level2-input ${showHelp ? 'level2-input-disabled' : ''} ${isDarkMode ? 'dark-theme' : 'light-theme'}`}
+              style={{ 
+                padding: '10px', 
+                fontSize: '18px', 
+                width: '150px', 
+                borderRadius: '5px', 
+                marginLeft: '10px',
+                cursor: showHelp ? 'not-allowed' : 'text',
+                outline: 'none'
+              }} 
+            />
+          </p>
+          
+          <p className={`level2-counter ${isDarkMode ? 'dark-theme' : 'light-theme'}`}>
+            問題 {count + 1} / 5
+          </p>
+          
+          <div>
+            <p className={`level2-timer ${showHelp ? 'help-active' : ''} ${isDarkMode ? 'dark-theme' : 'light-theme'}`}>
+              残り時間: {timeRemaining} 秒 {showHelp && '(一時停止中)'}
+            </p>
+            {/* プログレスバー */}
+            <div style={progressBarContainerStyle}>
+              <div style={progressBarStyle}></div>
+            </div>
+          </div>
+          
+          {/* 結果表示とヒント */}
+          <div style={{ marginTop: '20px', textAlign: 'center' }}>
+            {result && (
+              <p style={{ 
+                marginTop: '15px', 
+                fontSize: '20px', 
+                fontWeight: 'bold', 
+                color: result === '正解！' 
+                  ? (isDarkMode ? '#ff6b6b' : '#d32f2f')
+                  : (isDarkMode ? '#4dabf7' : '#1976d2')
+              }}>
+                {result}
+              </p>
+            )}
+            
+            <p style={{ 
+              fontSize: '0.8em', 
+              color: isDarkMode ? '#cccccc' : '#666666',
+              marginTop: '20px' 
+            }}>
+              ヒント: hキーで表示(Tip: Press the h key to display.)  | Enterキーで回答
+            </p>
+          </div>
+        </div>
+        
+        <button 
+          onClick={onGoBack} 
+          style={{ 
+            marginTop: '30px', 
+            padding: '10px 20px',
+            backgroundColor: isDarkMode ? '#555555' : '#f5f5f5',
+            color: isDarkMode ? '#ffffff' : '#000000',
+            border: isDarkMode ? '1px solid #666666' : '1px solid #cccccc',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          ホームに戻る(Return to home)
+        </button>
+      </div>
+      {showHelp && HelpPopup && <HelpPopup level="level2" onClose={() => setShowHelp(false)} />}
+    </>
+  );
+}
+
+// 以下のAppコンポーネントは既存のコードと同じ
 function App() {
   // 画面状態: 'home', 'game', 'level1', 'level3'
   const [screen, setScreen] = useState('home')
@@ -51,7 +226,7 @@ function App() {
 
   // タイマー管理（1秒間隔 - 表示用）
   useEffect(() => {
-    if (screen === 'level2' && !showHelp) { // ヒント表示中はタイマーを止める
+    if (screen === 'level2' && !showHelp) { // ヘルプ表示中はタイマーを止める
       if (timerIdRef.current) {
         clearInterval(timerIdRef.current);
       }
@@ -83,7 +258,7 @@ function App() {
 
   // プログレスバー用タイマー管理（100ms間隔）
   useEffect(() => {
-    if (screen === 'level2' && !showHelp) { // ヒント表示中はタイマーを止める
+    if (screen === 'level2' && !showHelp) { // ヘルプ表示中はタイマーを止める
       if (progressTimerIdRef.current) {
         clearInterval(progressTimerIdRef.current);
       }
@@ -110,10 +285,10 @@ function App() {
   }, [screen, showHelp]);
 
   const initializeQuestionSequence = () => {
-    const typeSum10Count = 2; // QUESTION_TYPE_SAME_UNITS_TENS_SUM_10 の問題数
+    const typeSum10Count = 2; // QUESTION_TYPE_UNITS_SAME_TENS_SUM_10 の問題数
     const typeDifferentUnitsCount = 3; // QUESTION_TYPE_SAME_TENS_DIFFERENT_UNITS の問題数
     let sequence = [];
-    for (let i = 0; i < typeSum10Count; i++) sequence.push(QUESTION_TYPE_SAME_UNITS_TENS_SUM_10);
+    for (let i = 0; i < typeSum10Count; i++) sequence.push(QUESTION_TYPE_UNITS_SAME_TENS_SUM_10);
     for (let i = 0; i < typeDifferentUnitsCount; i++) sequence.push(QUESTION_TYPE_SAME_TENS_DIFFERENT_UNITS);
 
     // Fisher-Yates shuffle でシーケンスをシャッフル
@@ -134,16 +309,13 @@ function App() {
     const currentQuestionType = questionSequence[currentQuestionIndex];
     let n4Value, n5Value;
 
-    if (currentQuestionType === QUESTION_TYPE_SAME_UNITS_TENS_SUM_10) {
-      const commonUnit = Math.floor(Math.random() * 9) + 1;
-      let tens1 = Math.floor(Math.random() * 9) + 1;
-      let tens2 = 10 - tens1;
-      if (tens2 === 0) {
-        tens1 = 9;
-        tens2 = 1;
-      }
-      n4Value = tens1 * 10 + commonUnit;
-      n5Value = tens2 * 10 + commonUnit;
+    if (currentQuestionType === QUESTION_TYPE_UNITS_SAME_TENS_SUM_10) {
+      // 一の位が同じ、十の位の和が10のパターン（例：23 × 73）
+      const commonUnit = Math.floor(Math.random() * 9) + 1; // 共通の一の位
+      const ten1 = Math.floor(Math.random() * 9) + 1; // 第一の数の十の位
+      const ten2 = 10 - ten1; // 第二の数の十の位（和が10になる）
+      n4Value = ten1 * 10 + commonUnit;
+      n5Value = ten2 * 10 + commonUnit;
     } else if (currentQuestionType === QUESTION_TYPE_SAME_TENS_DIFFERENT_UNITS) {
       const commonTens = Math.floor(Math.random() * 9) + 1;
       let unit1 = Math.floor(Math.random() * 9) + 1;
@@ -218,6 +390,27 @@ function App() {
     setScreen(targetScreen);
   };
 
+  // Level2画面の場合は独立したコンポーネントを使用
+  if (screen === 'level2') {
+    return (
+      <Level2Screen
+        num4={num4}
+        num5={num5}
+        count={currentQuestionIndex}
+        timeRemaining={timeRemaining}
+        progressTime={progressTime}
+        inputValue={inputValue}
+        setInputValue={setInputValue}
+        checkAnswer={checkAnswer}
+        result={result}
+        showHelp={showHelp}
+        setShowHelp={setShowHelp}
+        onGoBack={() => handleNavigation('home')}
+        HelpPopup={OriginalHelpPopup}
+      />
+    );
+  }
+
   return (
     <HomeScreen
       screen={screen}
@@ -225,8 +418,8 @@ function App() {
       num4={num4}
       num5={num5}
       count={currentQuestionIndex}
-      timeRemaining={timeRemaining} // 表示用（整数）
-      progressTime={progressTime} // プログレスバー用（小数点あり）
+      timeRemaining={timeRemaining}
+      progressTime={progressTime}
       inputValue={inputValue}
       setInputValue={setInputValue}
       checkAnswer={checkAnswer}
@@ -235,7 +428,7 @@ function App() {
       setShowHelp={setShowHelp}
       HelpPopup={({ level, ...otherProps }) => (
         <OriginalHelpPopup 
-          level={helpLevel} // ボタン操作またはキー入力に応じてレベル変更可
+          level={helpLevel}
           onClose={() => setShowHelp(false)} 
           {...otherProps} 
         />

@@ -9,6 +9,19 @@ const QUESTION_TYPE_UNITS_SAME_TENS_SUM_10 = 'UNITS_SAME_TENS_SUM_10'; // 一の
 const TOTAL_QUESTIONS = 5; // 問題の総数
 
 function Level3Screen({ onGoBack, onGoForward }) {
+  // 既存のstateに追加
+  const [isDarkMode, setIsDarkMode] = useState(
+    window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+  );
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e) => setIsDarkMode(e.matches);
+    
+    mediaQuery.addListener(handleChange);
+    return () => mediaQuery.removeListener(handleChange);
+  }, []);
+
   // ステート管理
   const [inputValue, setInputValue] = useState(''); // ユーザーの入力値
   const [numA, setNumA] = useState(null); // 問題の第一の数値
@@ -236,9 +249,17 @@ function Level3Screen({ onGoBack, onGoForward }) {
   // メインUI表示（Level2と同じレイアウト）
   return (
     <>
-      <div style={{ textAlign: 'center', marginTop: '50px' }}>
-        {/* ヘッダー */}
-        <h1>レベル3 - インド式計算チャレンジ</h1>
+      <div style={{ 
+        textAlign: 'center', 
+        marginTop: '50px',
+        color: isDarkMode ? '#ffffff' : '#000000',
+        backgroundColor: isDarkMode ? '#2d2d30' : '#ffffff',
+        minHeight: '100vh',
+        padding: '20px'
+      }}>
+        <h1 style={{ color: isDarkMode ? '#ffffff' : '#000000' }}>
+          level3
+        </h1>
         {/* メインコンテンツ */}
         <div style={{ 
           maxWidth: '600px', 
@@ -246,28 +267,40 @@ function Level3Screen({ onGoBack, onGoForward }) {
           padding: '20px', 
           border: '1px solid #ccc', 
           borderRadius: '8px', 
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)' 
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          backgroundColor: isDarkMode ? '#3c3c3f' : '#ffffff',
+          color: isDarkMode ? '#ffffff' : '#000000'
         }}>
           {/* 問題表示 - Level2と同じスタイル */}
-          <p style={{ fontSize: '24px', fontWeight: 'bold', textAlign: 'center' }}>
-            問題: {numA} × {numB} = <input 
-                type="text" 
-                value={inputValue} 
-                onChange={(e) => setInputValue(e.target.value)} 
-                onKeyDown={(e) => { if (e.key === 'Enter') { checkAnswer(); } }} 
-                placeholder="答えを入力" 
-                style={{ padding: '10px', fontSize: '18px', width: '150px', borderRadius: '5px', border: '1px solid #ccc', marginRight: '10px' }} 
-              />
+          <p className="level3-question">
+            問題(Question):{numA} × {numB} = 
+            <input 
+              type="text" 
+              value={inputValue} 
+              onChange={handleInputChange} 
+              onKeyDown={handleKeyDown} 
+              placeholder="答えを入力" 
+              disabled={showHelp} // ヘルプ表示中は入力無効
+              autoFocus={!showHelp} // ヘルプ非表示時のみフォーカス
+              className={`level3-input ${showHelp ? 'level3-input-disabled' : ''}`}
+              style={{ 
+                padding: '10px', 
+                fontSize: '18px', 
+                width: '150px', 
+                borderRadius: '5px', 
+                marginLeft: '10px',
+                cursor: showHelp ? 'not-allowed' : 'text',
+                outline: 'none',
+                backgroundColor: isDarkMode ? '#5c5c5f' : '#ffffff',
+                color: isDarkMode ? '#ffffff' : '#000000'
+              }} 
+            />
           </p>
-          <p style={{ textAlign: 'center' }}>問題 {currentQuestionIndex + 1} / {TOTAL_QUESTIONS}</p>
+          <p className="level3-counter">問題 {currentQuestionIndex + 1} / {TOTAL_QUESTIONS}</p>
           
           {/* タイマー表示 */}
           <div>
-            <p style={{ 
-              textAlign: 'center', 
-              marginBottom: '5px',
-              color: showHelp ? '#ff6b6b' : '#000' // ポップアップ表示中は赤色で警告
-            }}>
+            <p className={`level3-timer ${showHelp ? 'help-active' : ''}`}>
               残り時間: {Math.ceil(timeRemaining)} 秒 {showHelp && '(進行中)'}
             </p>
             {/* プログレスバー */}
@@ -276,17 +309,41 @@ function Level3Screen({ onGoBack, onGoForward }) {
             </div>
           </div>
           
-          {/* 入力エリア - Level2と同じスタイル */}
-          <div style={{ marginTop: '20px', textAlign: 'center' }}>
+           <div style={{ marginTop: '20px', textAlign: 'center' }}>
             <input 
-                type="text" 
-                value={inputValue} 
-                onChange={(e) => setInputValue(e.target.value)} 
-                onKeyDown={(e) => { if (e.key === 'Enter') { checkAnswer(); } }} 
-                placeholder="答えを入力" 
-                style={{ padding: '10px', fontSize: '18px', width: '150px', borderRadius: '5px', border: '1px solid #ccc', marginRight: '10px' }} 
-              />
-            
+              type="text" 
+              value={inputValue} 
+              onChange={handleInputChange} 
+              onKeyDown={handleKeyDown} 
+              placeholder="答えを入力" 
+              disabled={showHelp} // ヘルプ表示中は入力無効
+              className={`level3-input ${showHelp ? 'level3-input-disabled' : ''}`}
+              style={{ 
+                padding: '10px', 
+                fontSize: '18px', 
+                width: '150px', 
+                borderRadius: '5px', 
+                marginRight: '10px',
+                cursor: showHelp ? 'not-allowed' : 'text',
+                backgroundColor: isDarkMode ? '#5c5c5f' : '#ffffff',
+                color: isDarkMode ? '#ffffff' : '#000000'
+              }} 
+            />
+            <button
+              onClick={checkAnswer}
+              style={{ 
+                padding: '10px 20px', 
+                fontSize: '18px', 
+                backgroundColor: '#4caf50', 
+                color: 'white', 
+                border: 'none', 
+                borderRadius: '5px', 
+                cursor: 'pointer',
+                marginRight: '10px'
+              }}
+            >
+              回答
+            </button>
             {/* 結果表示 */}
             {result && (
               <p style={{ 
@@ -299,7 +356,7 @@ function Level3Screen({ onGoBack, onGoForward }) {
             
             {/* ヘルプヒント */}
             <p style={{ fontSize: '0.8em', color: 'gray', marginTop: '20px' }}>
-              ヒント: hキーでヘルプを表示 | Enterキーで回答
+              ヒント: hキーで表示(Tip: Press the h key to display.) | Enterキーで回答
             </p>
           </div>
         </div>
@@ -307,7 +364,7 @@ function Level3Screen({ onGoBack, onGoForward }) {
         <button 
           onClick={onGoBack} 
           style={{ marginTop: '30px', padding: '10px 20px' }}
-        >リタイア</button>
+        >ホームに戻る(Return to home)</button>
       </div>
 
       {/* ヘルプポップアップ */}
