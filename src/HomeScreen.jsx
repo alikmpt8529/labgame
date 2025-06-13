@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Level1Screen from './Level1Screen'; // Level1Screenコンポーネントをインポート
 import Level3Screen from './Level3Screen'; // Level3Screenコンポーネントをインポート
 import ResultPage from './ResultPage'; // ResultPageコンポーネントをインポート
@@ -18,8 +18,27 @@ function HomeScreen(props) {
     result,
     // Help popup props
     showHelp,
+    setShowHelp,
     HelpPopup, // App.jsx から渡された HelpPopup コンポーネント
   } = props;
+
+  useEffect(() => {
+  if (screen === 'home') {
+    setShowHelp(false);
+  }
+}, [screen, setShowHelp]);
+  // ホーム画面で h キーを押すとヘルプを表示
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (screen === 'home' && event.key === 'h') {
+        setShowHelp(true); // ホーム画面で h キーでヘルプ表示
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [screen, setShowHelp]);
 
   if (screen === 'home') {
     return (
@@ -34,6 +53,11 @@ function HomeScreen(props) {
         <button onClick={() => onNavigate('level3')} style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>
           Level 3
         </button>
+        {/* ホーム画面でもヒントキーの案内を表示 */}
+      <p style={{ fontSize: '0.8em', color: 'gray', marginTop: '20px' }}>
+        ヒント: hキーでヘルプを表示
+      </p>
+        {showHelp && HelpPopup && <HelpPopup level="level1" onClose={() => setShowHelp(false)} />} {/* ホーム画面でもヘルプ表示可能に */}
       </div>
     );
   }
@@ -46,7 +70,7 @@ function HomeScreen(props) {
     return (
       <>
         <Level3Screen onGoBack={() => onNavigate('home')} onGoForward={() => onNavigate('result')} />
-        {showHelp && HelpPopup && <HelpPopup level="level3" onClose={() => props.setShowHelp(false)} />}
+        {showHelp && HelpPopup && <HelpPopup level="level3" onClose={() => setShowHelp(false)} />} {/* Level 3 ヘルプ */}
       </>
     );
   }
@@ -104,7 +128,7 @@ function HomeScreen(props) {
           </div>
           <button onClick={() => onNavigate('home')} style={{ marginTop: '30px', padding: '10px 20px' }}>ホームに戻る</button>
         </div>
-        {showHelp && HelpPopup && <HelpPopup level="level2" onClose={() => props.setShowHelp(false)} />}
+        {showHelp && HelpPopup && <HelpPopup level="level2" onClose={() => setShowHelp(false)} />} {/* Level 2 ヘルプ */}
       </>
     );
   }
