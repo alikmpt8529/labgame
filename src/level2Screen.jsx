@@ -9,60 +9,77 @@ const QUESTION_TYPE_SAME_UNITS_TENS_SUM_10 = 'SAME_UNITS_TENS_SUM_10'; // 一の
 const QUESTION_TYPE_SAME_TENS_DIFFERENT_UNITS = 'SAME_TENS_DIFFERENT_UNITS'; // 十の位が同じ、一の位が異なる
 
 function App() {
-  // 画面状態: 'home', 'level2', 'level1', 'level3'
+  // 画面状態: 'home', 'game', 'level1', 'level3'
   const [screen, setScreen] = useState('home')
   const [count, setCount] = useState(0)
   const [inputValue, setInputValue] = useState('')
   const [num4, setNum4] = useState(0);
   const [num5, setNum5] = useState(0);
   const [result, setResult] = useState(null)
-  const [resultColor, setResultColor] = useState('black')
-  const [showHelp, setShowHelp] = useState(false)
+  const [showHelp, setShowHelp] = useState(true); // 初期状態でヒント表示
+  const [helpLevel, setHelpLevel] = useState('level2'); // 表示するヒントのレベル
   const [timeRemaining, setTimeRemaining] = useState(60)
   const [timeSpent, setTimeSpent] = useState(0);　//経過時間（秒）
   const timerIdRef = useRef(null)
+
   const [questionSequence, setQuestionSequence] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [gameEnded, setGameEnded] = useState(false); // ゲーム終了フラグを追加
 
-  // タイマー機能の改善
+  // 画面がlevel2に切り替わったタイミングでヒント表示＆レベル2設定
   useEffect(() => {
-    let timer;
-    // ゲームが終了していない場合のみタイマーを実行
-    if (screen === 'level2' && timeRemaining > 0 && currentQuestionIndex < questionSequence.length && !gameEnded) {
-      timer = setTimeout(() => {
-        setTimeRemaining(timeRemaining - 1);
-      }, 1000);
-    } else if (screen === 'level2' && timeRemaining === 0 && !gameEnded) {
-      // 時間切れ処理
-      setGameEnded(true); // ゲーム終了フラグを設定
-      alert('時間切れです！');
-      setScreen('home');
-    }
-    
-    return () => {
-      if (timer) {
-        clearTimeout(timer);
-      }
-    };
-  }, [screen, timeRemaining, currentQuestionIndex, questionSequence.length, gameEnded]);
-
-  // 画面遷移時のクリーンアップ
-  useEffect(() => {
-    if (screen !== 'level2') {
-      // Level2以外の画面に移動時、すべてのタイマー関連をリセット
-      if (timerIdRef.current) {
-        clearInterval(timerIdRef.current);
-        timerIdRef.current = null;
-      }
-      setGameEnded(false); // ゲーム終了フラグをリセット
+    if (screen === 'level2') {
+      setHelpLevel('level2');  // ヒントレベルを2に設定
+      setShowHelp(true);       // ヒント表示ON
+      initializeQuestionSequence();
     }
   }, [screen]);
 
-  // 問題シーケンスの初期化
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if ((screen === 'level2' || screen === 'level3') && event.key === 'h') {
+        setHelpLevel(screen); // 現在のレベルをヒントレベルに
+        setShowHelp(true);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [screen]);
+
+  // タイマー管理
+  useEffect(() => {
+    if (screen === 'level2' && !showHelp) { // ヒント表示中はタイマーを止める
+      if (timerIdRef.current) {
+        clearInterval(timerIdRef.current);
+      }
+      timerIdRef.current = setInterval(() => {
+        setTimeRemaining(prevTime => {
+          if (prevTime <= 1) {
+            clearInterval(timerIdRef.current);
+            setScreen('home'); // 時間切れでホームへ
+            alert('時間切れです！');
+            return 0;
+          }
+          return prevTime - 1;
+        });
+      }, 1000);
+    } else {
+      if (timerIdRef.current) {
+        clearInterval(timerIdRef.current);
+      }
+    }
+    return () => {
+      if (timerIdRef.current) {
+        clearInterval(timerIdRef.current);
+      }
+    };
+  }, [screen, showHelp]); // showHelpを依存に追加
+
   const initializeQuestionSequence = () => {
-    const typeSum10Count = 2;
-    const typeDifferentUnitsCount = 3;
+    const typeSum10Count = 2; // QUESTION_TYPE_SAME_UNITS_TENS_SUM_10 の問題数
+    const typeDifferentUnitsCount = 3; // QUESTION_TYPE_SAME_TENS_DIFFERENT_UNITS の問題数
     let sequence = [];
     for (let i = 0; i < typeSum10Count; i++) sequence.push(QUESTION_TYPE_SAME_UNITS_TENS_SUM_10);
     for (let i = 0; i < typeDifferentUnitsCount; i++) sequence.push(QUESTION_TYPE_SAME_TENS_DIFFERENT_UNITS);
@@ -75,10 +92,8 @@ function App() {
     setQuestionSequence(sequence);
     setCurrentQuestionIndex(0);
     setCount(0);
-    setGameEnded(false); // ゲーム終了フラグをリセット
   };
 
-  // 問題生成
   const generateQuestion = () => {
     if (questionSequence.length === 0 || currentQuestionIndex >= questionSequence.length) {
       return;
@@ -118,52 +133,31 @@ function App() {
     setResult(null);
   };
 
-  // キーボードイベント処理（hキーでヘルプ表示）
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (screen === 'level2' && event.key === 'h') {
-        setShowHelp(!showHelp);
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [screen, showHelp]);
-
   useEffect(() => {
     if (screen === 'level2') {
       initializeQuestionSequence();
-      setTimeRemaining(60); // タイマーをリセット
     }
   }, [screen]);
 
   useEffect(() => {
     if (screen === 'level2' && questionSequence.length > 0 && currentQuestionIndex < questionSequence.length) {
       generateQuestion();
-      setTimeRemaining(60); // 新しい問題でタイマーをリセット
+      setTimeRemaining(60);
     }
   }, [screen, questionSequence, currentQuestionIndex]);
 
   const answer = num4 * num5;
 
   const checkAnswer = () => {
-    if (gameEnded) return; // ゲーム終了時は処理しない
-    
     if (parseInt(inputValue, 10) === answer) {
       setResult('正解！')
-      setResultColor('red')
       const nextQuestionIndex = currentQuestionIndex + 1;
-      // 経過時間を更新
       setTimeSpent(timeSpent + (60 - timeRemaining));
       setCount(nextQuestionIndex);
 
       if (nextQuestionIndex >= questionSequence.length) {
-        setGameEnded(true); // ゲーム終了フラグを設定
         setTimeout(() => {
           alert('クリア時間' + timeSpent + '秒');
-          // 結果画面に遷移
           setScreen('result');
         }, 1000)
       } else {
@@ -173,123 +167,38 @@ function App() {
       }
     } else {
       setResult('不正解')
-      setResultColor('blue')
     }
   }
 
   const handleNavigation = (targetScreen) => {
-    // ナビゲーション時にゲーム終了フラグをリセット
     if (targetScreen === 'level2' && screen !== 'level2') {
       setInputValue('');
       setResult(null);
-      setGameEnded(false);
     } else if (targetScreen !== 'level2' && screen === 'level2') {
       if (timerIdRef.current) {
         clearInterval(timerIdRef.current);
-        timerIdRef.current = null;
       }
-      setGameEnded(false);
     }
     setScreen(targetScreen);
   };
 
-  // Level2画面のUI
-  if (screen === 'level2') {
-    const progressBarContainerStyle = {
-      width: '100%',
-      height: '20px',
-      backgroundColor: '#e0e0e0',
-      borderRadius: '10px',
-      overflow: 'hidden',
-      margin: '10px 0 20px 0'
-    };
-
-    const progressBarStyle = {
-      height: '100%',
-      width: `${(timeRemaining / 60) * 100}%`,
-      backgroundColor: timeRemaining > 10 ? '#4caf50' : '#f44336',
-      transition: 'width 0.5s linear'
-    };
-
-    return (
-      <>
-        <div style={{ textAlign: 'center', marginTop: '50px' }}>
-          <h1>レベル2 - インド式計算ゲーム</h1>
-          <div style={{ maxWidth: '600px', margin: '20px auto', padding: '20px', border: '1px solid #ccc', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-            <div style={{ 
-              fontSize: '24px', 
-              fontWeight: 'bold', 
-              textAlign: 'center',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              margin: '20px 0'
-            }}>
-              <span>問題: {num4} × {num5} = </span>
-              <input 
-                type="text" 
-                value={inputValue} 
-                onChange={(e) => setInputValue(e.target.value)} 
-                onKeyDown={(e) => { if (e.key === 'Enter' && !gameEnded) { checkAnswer(); } }} 
-                placeholder="答えを入力" 
-                disabled={gameEnded}
-                style={{ 
-                  padding: '10px', 
-                  fontSize: '18px', 
-                  width: '150px', 
-                  borderRadius: '5px', 
-                  border: '1px solid #ccc', 
-                  marginLeft: '10px',
-                  backgroundColor: gameEnded ? '#f5f5f5' : '#ffffff'
-                }} 
-              />
-            </div>
-            <p style={{ textAlign: 'center' }}>問題 {count + 1} / 5</p>
-            
-            {/* タイマー表示と視覚化 */}
-            <div>
-              <p style={{ textAlign: 'center', marginBottom: '5px' }}>残り時間: {timeRemaining} 秒</p>
-              <div style={progressBarContainerStyle}>
-                <div style={progressBarStyle}></div>
-              </div>
-            </div>
-            
-            <div style={{ marginTop: '20px', textAlign: 'center' }}>
-              {result && (
-                <p style={{ 
-                  marginTop: '15px', 
-                  fontSize: '20px', 
-                  fontWeight: 'bold', 
-                  color: resultColor
-                }}>
-                  {result}
-                </p>
-              )}
-              <p style={{ fontSize: '0.8em', color: 'gray', marginTop: '20px' }}>ヒント: hキーでヘルプを表示</p>
-            </div>
-          </div>
-          <button onClick={() => handleNavigation('home')} style={{ marginTop: '30px', padding: '10px 20px' }}>ホームに戻る</button>
-        </div>
-        {showHelp && (
-          <OriginalHelpPopup 
-            level="level2" 
-            onClose={() => setShowHelp(false)} 
-          />
-        )}
-      </>
-    );
-  }
-
-  // その他の画面はHomeScreenに委譲
   return (
     <HomeScreen
       screen={screen}
       onNavigate={handleNavigation}
+      num4={num4}
+      num5={num5}
+      count={currentQuestionIndex}
+      timeRemaining={timeRemaining}
+      inputValue={inputValue}
+      setInputValue={setInputValue}
+      checkAnswer={checkAnswer}
+      result={result}
       showHelp={showHelp}
       setShowHelp={setShowHelp}
       HelpPopup={({ level, ...otherProps }) => (
         <OriginalHelpPopup 
-          level={level} 
+          level={helpLevel} // ボタン操作またはキー入力に応じてレベル変更可
           onClose={() => setShowHelp(false)} 
           {...otherProps} 
         />
