@@ -16,7 +16,7 @@ function Level3Screen({ onGoBack, onGoForward }) {
   const [result, setResult] = useState(null); // 回答結果（正解/不正解）
   const [showHelp, setShowHelp] = useState(false); // ヘルプ表示フラグ
   const [timeRemaining, setTimeRemaining] = useState(60); // 残り時間（秒）
-  const [timeSpent, setTimeSpent] = useState(0);//経過時間（秒）
+  const [timeSpent, setTimeSpent] = useState(0);　//経過時間（秒）
   const timerIdRef = useRef(null); // タイマーID保持用
   const [questionSequence, setQuestionSequence] = useState([]); // 問題の出題順序
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0); // 現在の問題番号
@@ -38,15 +38,15 @@ function Level3Screen({ onGoBack, onGoForward }) {
   }, []);
 
   // Level3開始時にヘルプポップアップを自動表示
-  // useEffect(() => {
-  //   const timer = setTimeout(() => {
-  //     setShowHelp(true);
-  //   }, 100); // 0.1秒後に表示
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowHelp(true);
+    }, 100); // 0.1秒後に表示
     
-  //   return () => clearTimeout(timer);
-  // }, []); // 初回のみ実行
+    return () => clearTimeout(timer);
+  }, []); // 初回のみ実行
 
-  // タイマー管理
+  // タイマー管理（より滑らかな更新）
   useEffect(() => {
     // 時間切れの場合の処理
     if (timeRemaining <= 0) {
@@ -61,8 +61,8 @@ function Level3Screen({ onGoBack, onGoForward }) {
     if (timerIdRef.current) {
       clearInterval(timerIdRef.current);
     }
-    // ゲーム進行中は常にタイマーを開始
-    if (currentQuestionIndex < TOTAL_QUESTIONS) {
+    // ポップアップが表示されていない場合のみタイマーを開始
+    if (!showHelp && currentQuestionIndex < TOTAL_QUESTIONS) {
       timerIdRef.current = setInterval(() => {
         setTimeRemaining(prevTime => {
           const newTime = prevTime - 0.1; // 0.1秒ずつ減らす
@@ -76,7 +76,7 @@ function Level3Screen({ onGoBack, onGoForward }) {
         clearInterval(timerIdRef.current);
       }
     };
-  }, [timeRemaining, onGoBack, currentQuestionIndex]); // showHelpを依存配列から削除
+  }, [timeRemaining, onGoBack, currentQuestionIndex, showHelp]);
 
   // 問題シーケンスの初期化
   const initializeQuestionSequence = () => {
@@ -171,7 +171,7 @@ function Level3Screen({ onGoBack, onGoForward }) {
       // 結果画面に遷移
       onGoForward();
     }
-  }, [questionSequence, currentQuestionIndex, onGoBack]);
+  }, [questionSequence, currentQuestionIndex, screen]);
 
   // 回答チェック処理
   const checkAnswer = () => {
@@ -252,9 +252,9 @@ function Level3Screen({ onGoBack, onGoForward }) {
             <p style={{ 
               textAlign: 'center', 
               marginBottom: '5px',
-              color: showHelp ? '#ff6b6b' : '#000' // ポップアップ表示中は赤色で警告
+              color: showHelp ? '#999' : '#000'
             }}>
-              残り時間: {Math.ceil(timeRemaining)} 秒 {showHelp && '(進行中)'}
+              残り時間: {Math.ceil(timeRemaining)} 秒 {showHelp && '(一時停止中)'}
             </p>
             {/* プログレスバー */}
             <div style={{ 
@@ -264,14 +264,14 @@ function Level3Screen({ onGoBack, onGoForward }) {
               borderRadius: '10px', 
               overflow: 'hidden', 
               margin: '10px 0 20px 0',
-              opacity: showHelp ? 0.8 : 1 // ポップアップ表示中も視認性を保つ
+              opacity: showHelp ? 0.5 : 1
             }}>
               <div style={{ 
                 height: '100%', 
                 width: `${(timeRemaining / 60) * 100}%`, 
                 backgroundColor: timeRemaining > 10 ? '#4caf50' : '#f44336', 
-                transition: 'width 0.1s linear',
-                willChange: 'width'
+                transition: 'width 0.1s linear', // より短い遷移時間で滑らかに
+                willChange: 'width' // パフォーマンス最適化
               }}></div>
             </div>
           </div>
@@ -283,13 +283,12 @@ function Level3Screen({ onGoBack, onGoForward }) {
                 marginTop: '15px', 
                 fontSize: '20px', 
                 fontWeight: 'bold', 
-                color: result === '正解！' ? 'red' : 'blue'
+                color: result === '正解！' ? 'red' : 'blue' // 正解は赤色、不正解は青色
               }}>{result}</p>
             )}
             {/* ヘルプヒント */}
             <p style={{ fontSize: '0.8em', color: 'gray', marginTop: '20px' }}>
-              ヒント: hキーでヘルプを表示
-            </p>
+              ヒント: hキーでヘルプを表示</p>
           </div>
         </div>
         {/* ホームに戻るボタン */}
