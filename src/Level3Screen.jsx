@@ -278,14 +278,7 @@ function Level3Screen({ onGoBack, onGoForward }) {
           
           {/* 入力エリア - Level2と同じスタイル */}
           <div style={{ marginTop: '20px', textAlign: 'center' }}>
-            <input 
-                type="text" 
-                value={inputValue} 
-                onChange={(e) => setInputValue(e.target.value)} 
-                onKeyDown={(e) => { if (e.key === 'Enter') { checkAnswer(); } }} 
-                placeholder="答えを入力" 
-                style={{ padding: '10px', fontSize: '18px', width: '150px', borderRadius: '5px', border: '1px solid #ccc', marginRight: '10px' }} 
-              />
+            <button onClick={checkAnswer} style={{ padding: '10px 15px', fontSize: '18px' }}>回答</button>
             
             {/* 結果表示 */}
             {result && (
