@@ -299,7 +299,7 @@ function Level3Screen({ onGoBack, onGoForward }) {
             
             {/* ヘルプヒント */}
             <p style={{ fontSize: '0.8em', color: 'gray', marginTop: '20px' }}>
-              ヒント: hキーでヘルプを表示（タイマーは進行します） | Enterキーで回答
+              ヒント: hキーでヘルプを表示 | Enterキーで回答
             </p>
           </div>
         </div>
