@@ -75,7 +75,7 @@ function Level3Screen({ onGoBack, onGoForward }) {
       clearInterval(timerIdRef.current);
     }
     // ゲーム進行中は常にタイマーを開始（ポップアップ表示中も進行）
-    if (currentQuestionIndex < TOTAL_QUESTIONS) {
+    if (!showHelp&&currentQuestionIndex < TOTAL_QUESTIONS) {
       timerIdRef.current = setInterval(() => {
         setTimeRemaining(prevTime => {
           const newTime = prevTime - 0.1; // 0.1秒ずつ減らす
@@ -89,7 +89,7 @@ function Level3Screen({ onGoBack, onGoForward }) {
         clearInterval(timerIdRef.current);
       }
     };
-  }, [timeRemaining, onGoBack, currentQuestionIndex]); // showHelpを依存配列から削除
+  }, [timeRemaining, onGoBack, currentQuestionIndex, showHelp]); // showHelpを依存配列から削除
 
   // 問題シーケンスの初期化
   const initializeQuestionSequence = () => {
@@ -249,27 +249,19 @@ function Level3Screen({ onGoBack, onGoForward }) {
   // メインUI表示（Level2と同じレイアウト）
   return (
     <>
-      <div style={{ 
-        textAlign: 'center', 
-        marginTop: '50px',
+      <div className={`game-container ${showHelp ? 'popup-active' : ''}`} style={{ 
         color: isDarkMode ? '#ffffff' : '#000000',
         backgroundColor: isDarkMode ? '#2d2d30' : '#ffffff',
-        minHeight: '100vh',
-        padding: '20px'
       }}>
-        <h1 style={{ color: isDarkMode ? '#ffffff' : '#000000' }}>
+        <h1 className="game-title" style={{ color: isDarkMode ? '#ffffff' : '#000000' }}>
           level3
         </h1>
-        {/* メインコンテンツ */}
-        <div style={{ 
-          maxWidth: '600px', 
-          margin: '20px auto', 
-          padding: '20px', 
-          border: '1px solid #ccc', 
-          borderRadius: '8px', 
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          backgroundColor: isDarkMode ? '#3c3c3f' : '#ffffff',
-          color: isDarkMode ? '#ffffff' : '#000000'
+        <div className="game-main-content" style={{ 
+          border: isDarkMode ? '1px solid #555555' : '1px solid #cccccc',
+          boxShadow: isDarkMode 
+            ? '0 2px 4px rgba(0,0,0,0.3)' 
+            : '0 2px 4px rgba(0,0,0,0.1)',
+          backgroundColor: isDarkMode ? '#3c3c3f' : '#ffffff'
         }}>
           {/* 問題表示 - Level2と同じスタイル */}
           <p className="level3-question">
@@ -296,12 +288,12 @@ function Level3Screen({ onGoBack, onGoForward }) {
               }} 
             />
           </p>
-          <p className="level3-counter">問題 {currentQuestionIndex + 1} / {TOTAL_QUESTIONS}</p>
+          <p className="level3-counter">now:{currentQuestionIndex + 1} / {TOTAL_QUESTIONS}</p>
           
           {/* タイマー表示 */}
           <div>
             <p className={`level3-timer ${showHelp ? 'help-active' : ''}`}>
-              残り時間: {Math.ceil(timeRemaining)} 秒 {showHelp && '(進行中)'}
+              残り時間(remaining time): {Math.ceil(timeRemaining)} 秒 {showHelp && '(進行中)'}
             </p>
             {/* プログレスバー */}
             <div style={progressBarContainerStyle}>
@@ -309,70 +301,47 @@ function Level3Screen({ onGoBack, onGoForward }) {
             </div>
           </div>
           
-           <div style={{ marginTop: '20px', textAlign: 'center' }}>
-            <input 
-              type="text" 
-              value={inputValue} 
-              onChange={handleInputChange} 
-              onKeyDown={handleKeyDown} 
-              placeholder="答えを入力" 
-              disabled={showHelp} // ヘルプ表示中は入力無効
-              className={`level3-input ${showHelp ? 'level3-input-disabled' : ''}`}
-              style={{ 
-                padding: '10px', 
-                fontSize: '18px', 
-                width: '150px', 
-                borderRadius: '5px', 
-                marginRight: '10px',
-                cursor: showHelp ? 'not-allowed' : 'text',
-                backgroundColor: isDarkMode ? '#5c5c5f' : '#ffffff',
-                color: isDarkMode ? '#ffffff' : '#000000'
-              }} 
-            />
-            <button
-              onClick={checkAnswer}
-              style={{ 
-                padding: '10px 20px', 
-                fontSize: '18px', 
-                backgroundColor: '#4caf50', 
-                color: 'white', 
-                border: 'none', 
-                borderRadius: '5px', 
-                cursor: 'pointer',
-                marginRight: '10px'
-              }}
-            >
-              回答
-            </button>
-            {/* 結果表示 */}
+          <div className="game-input-section">
+            <div className="game-input-row">
+              
+            </div>
+            
             {result && (
-              <p style={{ 
-                marginTop: '15px', 
-                fontSize: '20px', 
-                fontWeight: 'bold', 
-                color: result === '正解！' ? 'red' : 'blue' // 正解は赤色、不正解は青色
-              }}>{result}</p>
+              <p className="game-result" style={{ 
+                color: result === '正解！' 
+                  ? (isDarkMode ? '#ff6b6b' : '#d32f2f')
+                  : (isDarkMode ? '#4dabf7' : '#1976d2')
+              }}>
+                {result}
+              </p>
             )}
             
-            {/* ヘルプヒント */}
-            <p style={{ fontSize: '0.8em', color: 'gray', marginTop: '20px' }}>
-              ヒント: hキーで表示(Tip: Press the h key to display.) | Enterキーで回答
+            <p className="game-hint" style={{ 
+              color: isDarkMode ? '#cccccc' : '#666666'
+            }}>
+              ヒント: hキーで表示(Hint: Press the h key to display.) | Enterキーで回答
             </p>
           </div>
         </div>
-        {/* ホームに戻るボタン */}
+        
         <button 
           onClick={onGoBack} 
-          style={{ marginTop: '30px', padding: '10px 20px' }}
-        >ホームに戻る(Return to home)</button>
+          className="game-retry-button"
+        >
+          ホームに戻る(return to home)
+        </button>
       </div>
 
-      {/* ヘルプポップアップ */}
+      {/* ポップアップを最前面に表示 */}
       {showHelp && (
-        <HelpPopup 
-          level="level3" 
-          onClose={() => setShowHelp(false)} 
-        />
+        <div className="help-popup">
+          <div className={`help-popup-content ${isDarkMode ? 'dark' : ''}`}>
+            <HelpPopup 
+              level="level3" 
+              onClose={() => setShowHelp(false)} 
+            />
+          </div>
+        </div>
       )}
     </>
   );

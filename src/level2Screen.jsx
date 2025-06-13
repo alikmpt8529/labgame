@@ -77,31 +77,23 @@ function Level2Screen({
 
   return (
     <>
-      <div style={{ 
-        textAlign: 'center', 
-        marginTop: '50px',
+      <div className={`game-container ${showHelp ? 'popup-active' : ''}`} style={{ 
         color: isDarkMode ? '#ffffff' : '#000000',
         backgroundColor: isDarkMode ? '#2d2d30' : '#ffffff',
-        minHeight: '100vh',
-        padding: '20px'
       }}>
-        <h1 style={{ color: isDarkMode ? '#ffffff' : '#000000' }}>
+        <h1 className="game-title" style={{ color: isDarkMode ? '#ffffff' : '#000000' }}>
           level2
         </h1>
-        <div style={{ 
-          maxWidth: '600px', 
-          margin: '20px auto', 
-          padding: '20px', 
+        <div className="game-main-content" style={{ 
           border: isDarkMode ? '1px solid #555555' : '1px solid #cccccc',
-          borderRadius: '8px', 
           boxShadow: isDarkMode 
             ? '0 2px 4px rgba(0,0,0,0.3)' 
             : '0 2px 4px rgba(0,0,0,0.1)',
           backgroundColor: isDarkMode ? '#3c3c3c' : '#ffffff'
         }}>
           {/* 問題表示 */}
-          <p className={`level2-question ${isDarkMode ? 'dark-theme' : 'light-theme'}`}>
-            問題(Question): {num4} × {num5} = 
+          <p className={`game-question level2-question ${isDarkMode ? 'dark-theme' : 'light-theme'}`}>
+            問題: {num4} × {num5} = 
             <input 
               type="text" 
               value={inputValue} 
@@ -110,40 +102,26 @@ function Level2Screen({
               placeholder="答えを入力" 
               disabled={showHelp}
               autoFocus={!showHelp}
-              className={`level2-input ${showHelp ? 'level2-input-disabled' : ''} ${isDarkMode ? 'dark-theme' : 'light-theme'}`}
-              style={{ 
-                padding: '10px', 
-                fontSize: '18px', 
-                width: '150px', 
-                borderRadius: '5px', 
-                marginLeft: '10px',
-                cursor: showHelp ? 'not-allowed' : 'text',
-                outline: 'none'
-              }} 
+              className={`game-input level2-input ${showHelp ? 'level2-input-disabled' : ''} ${isDarkMode ? 'dark-theme' : 'light-theme'}`}
             />
           </p>
           
-          <p className={`level2-counter ${isDarkMode ? 'dark-theme' : 'light-theme'}`}>
+          <p className={`game-counter level2-counter ${isDarkMode ? 'dark-theme' : 'light-theme'}`}>
             問題 {count + 1} / 5
           </p>
           
           <div>
-            <p className={`level2-timer ${showHelp ? 'help-active' : ''} ${isDarkMode ? 'dark-theme' : 'light-theme'}`}>
+            <p className={`game-timer level2-timer ${showHelp ? 'help-active' : ''} ${isDarkMode ? 'dark-theme' : 'light-theme'}`}>
               残り時間: {timeRemaining} 秒 {showHelp && '(一時停止中)'}
             </p>
-            {/* プログレスバー */}
-            <div style={progressBarContainerStyle}>
+            <div className="game-progress-container" style={progressBarContainerStyle}>
               <div style={progressBarStyle}></div>
             </div>
           </div>
           
-          {/* 結果表示とヒント */}
-          <div style={{ marginTop: '20px', textAlign: 'center' }}>
+          <div className="game-input-section">
             {result && (
-              <p style={{ 
-                marginTop: '15px', 
-                fontSize: '20px', 
-                fontWeight: 'bold', 
+              <p className="game-result" style={{ 
                 color: result === '正解！' 
                   ? (isDarkMode ? '#ff6b6b' : '#d32f2f')
                   : (isDarkMode ? '#4dabf7' : '#1976d2')
@@ -152,32 +130,30 @@ function Level2Screen({
               </p>
             )}
             
-            <p style={{ 
-              fontSize: '0.8em', 
-              color: isDarkMode ? '#cccccc' : '#666666',
-              marginTop: '20px' 
+            <p className="game-hint" style={{ 
+              color: isDarkMode ? '#cccccc' : '#666666'
             }}>
-              ヒント: hキーで表示(Tip: Press the h key to display.)  | Enterキーで回答
+              ヒント: hキーで表示(Hint: Press the h key to display.) | Enterキーで回答
             </p>
           </div>
         </div>
         
         <button 
           onClick={onGoBack} 
-          style={{ 
-            marginTop: '30px', 
-            padding: '10px 20px',
-            backgroundColor: isDarkMode ? '#555555' : '#f5f5f5',
-            color: isDarkMode ? '#ffffff' : '#000000',
-            border: isDarkMode ? '1px solid #666666' : '1px solid #cccccc',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}
+          className="game-retry-button"
         >
-          ホームに戻る(Return to home)
+          ホームに戻る(return to home)
         </button>
       </div>
-      {showHelp && HelpPopup && <HelpPopup level="level2" onClose={() => setShowHelp(false)} />}
+      
+      {/* ポップアップを最前面に表示 */}
+      {showHelp && HelpPopup && (
+        <div className="help-popup">
+          <div className={`help-popup-content ${isDarkMode ? 'dark' : ''}`}>
+            <HelpPopup level="level2" onClose={() => setShowHelp(false)} />
+          </div>
+        </div>
+      )}
     </>
   );
 }
