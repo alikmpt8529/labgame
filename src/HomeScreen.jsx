@@ -11,7 +11,8 @@ function HomeScreen(props) {
     num4,
     num5,
     count,
-    timeRemaining,
+    timeRemaining, // 表示用（整数）
+    progressTime,  // プログレスバー用（小数点あり）
     inputValue,
     setInputValue,
     checkAnswer,
@@ -19,7 +20,7 @@ function HomeScreen(props) {
     // Help popup props
     showHelp,
     setShowHelp,
-    HelpPopup, // App.jsx から渡された HelpPopup コンポーネント
+    HelpPopup,
   } = props;
 
   useEffect(() => {
@@ -82,15 +83,15 @@ function HomeScreen(props) {
       height: '20px',
       backgroundColor: '#e0e0e0',
       borderRadius: '10px',
-      overflow: 'hidden', // バーがはみ出ないように
-      margin: '10px 0 20px 0' // 上下のマージン調整
+      overflow: 'hidden',
+      margin: '10px 0 20px 0'
     };
 
     const progressBarStyle = {
       height: '100%',
-      width: `${(timeRemaining / 60) * 100}%`,
-      backgroundColor: timeRemaining > 10 ? '#4caf50' : '#f44336', // 残り時間で色変更
-      transition: 'width 0.5s linear' // スムーズなトランジション
+      width: `${(progressTime / 60) * 100}%`, // progressTimeを使用
+      backgroundColor: progressTime > 10 ? '#4caf50' : '#f44336', // progressTimeで色判定
+      transition: 'width 0.1s linear' // 100ms更新に対応
     };
 
     return (
@@ -99,16 +100,7 @@ function HomeScreen(props) {
           <h1>レベル2 - インド式計算ゲーム</h1>
           <div style={{ maxWidth: '600px', margin: '20px auto', padding: '20px', border: '1px solid #ccc', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
             <p style={{ fontSize: '24px', fontWeight: 'bold', textAlign: 'center' }}>
-              問題: {num4} × {num5} = ?
-            </p>
-            <p style={{ textAlign: 'center' }}>問題 {count + 1} / 5</p>
-            <div>
-              <p style={{ textAlign: 'center', marginBottom: '5px' }}>残り時間: {timeRemaining} 秒</p>
-              <div style={progressBarContainerStyle}>
-                <div style={progressBarStyle}></div>
-              </div>
-            </div>
-            <div style={{ marginTop: '20px', textAlign: 'center' }}>
+              問題: {num4} × {num5} = 
               <input 
                 type="text" 
                 value={inputValue} 
@@ -117,6 +109,23 @@ function HomeScreen(props) {
                 placeholder="答えを入力" 
                 style={{ padding: '10px', fontSize: '18px', width: '150px', borderRadius: '5px', border: '1px solid #ccc', marginRight: '10px' }} 
               />
+            </p>
+            <p style={{ textAlign: 'center' }}>問題 {count + 1} / 5</p>
+            <div>
+              
+              <p style={{ 
+                textAlign: 'center', 
+                marginBottom: '5px',
+                color: showHelp ? '#999' : '#000'
+              }}>
+                残り時間: {timeRemaining} 秒 {showHelp && '(一時停止中)'}
+              </p>
+              <div style={progressBarContainerStyle}>
+                <div style={progressBarStyle}></div>
+              </div>
+            </div>
+            <div style={{ marginTop: '20px', textAlign: 'center' }}>
+              
               <button onClick={checkAnswer} style={{ padding: '10px 15px', fontSize: '18px' }}>回答</button>
               {result && (
                 <p style={{ marginTop: '15px', fontSize: '20px', fontWeight: 'bold', color: result === '正解！' ? '#4caf50' : '#f44336' }}>
@@ -128,7 +137,7 @@ function HomeScreen(props) {
           </div>
           <button onClick={() => onNavigate('home')} style={{ marginTop: '30px', padding: '10px 20px' }}>ホームに戻る</button>
         </div>
-        {showHelp && HelpPopup && <HelpPopup level="level2" onClose={() => setShowHelp(false)} />} {/* Level 2 ヘルプ */}
+        {showHelp && HelpPopup && <HelpPopup level="level2" onClose={() => setShowHelp(false)} />}
       </>
     );
   }
