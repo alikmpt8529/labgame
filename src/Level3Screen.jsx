@@ -46,9 +46,9 @@ function Level3Screen({ onGoBack, onGoForward }) {
     return () => clearTimeout(timer);
   }, []); // 初回のみ実行
 
-  // タイマー管理（より滑らかな更新）
+  // タイマー管理（ポップアップ表示中も進行）
   useEffect(() => {
-    // 時間切れの場合の処理
+    // 時間切れの場合の処理  
     if (timeRemaining <= 0) {
       if (timerIdRef.current) {
         clearInterval(timerIdRef.current);
@@ -61,8 +61,8 @@ function Level3Screen({ onGoBack, onGoForward }) {
     if (timerIdRef.current) {
       clearInterval(timerIdRef.current);
     }
-    // ポップアップが表示されていない場合のみタイマーを開始
-    if (!showHelp && currentQuestionIndex < TOTAL_QUESTIONS) {
+    // ゲーム進行中は常にタイマーを開始（ポップアップ表示中も進行）
+    if (currentQuestionIndex < TOTAL_QUESTIONS) {
       timerIdRef.current = setInterval(() => {
         setTimeRemaining(prevTime => {
           const newTime = prevTime - 0.1; // 0.1秒ずつ減らす
@@ -76,7 +76,7 @@ function Level3Screen({ onGoBack, onGoForward }) {
         clearInterval(timerIdRef.current);
       }
     };
-  }, [timeRemaining, onGoBack, currentQuestionIndex, showHelp]);
+  }, [timeRemaining, onGoBack, currentQuestionIndex]); // showHelpを依存配列から削除
 
   // 問題シーケンスの初期化
   const initializeQuestionSequence = () => {
@@ -167,16 +167,36 @@ function Level3Screen({ onGoBack, onGoForward }) {
         clearInterval(timerIdRef.current);
       }
       alert('クリア時間' + timeSpent + '秒');
-      /*onGoBack();*/
       // 結果画面に遷移
       onGoForward();
     }
-  }, [questionSequence, currentQuestionIndex, screen]);
+  }, [questionSequence, currentQuestionIndex]);
+
+  // 入力値の変更処理（数字のみ許可）
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    // 数字のみを許可（空文字も許可）
+    if (value === '' || /^\d+$/.test(value)) {
+      setInputValue(value);
+    }
+  };
+
+  // キーボード入力処理
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && inputValue.trim() !== '') {
+      checkAnswer();
+    }
+    // 数字、Backspace、Delete、Arrow keys、Tabのみ許可
+    if (!/[\d]/.test(e.key) && 
+        !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter'].includes(e.key)) {
+      e.preventDefault();
+    }
+  };
 
   // 回答チェック処理
   const checkAnswer = () => {
     // 数値が設定されていない場合は処理しない
-    if (numA === null || numB === null) return;
+    if (numA === null || numB === null || inputValue.trim() === '') return;
     const correctAnswer = numA * numB;
     
     if (parseInt(inputValue, 10) === correctAnswer) {
@@ -196,7 +216,24 @@ function Level3Screen({ onGoBack, onGoForward }) {
     }
   };
 
-  // メインUI表示
+  // Level2と同じプログレスバースタイル
+  const progressBarContainerStyle = {
+    width: '100%',
+    height: '20px',
+    backgroundColor: '#e0e0e0',
+    borderRadius: '10px',
+    overflow: 'hidden', 
+    margin: '10px 0 20px 0' 
+  };
+
+  const progressBarStyle = {
+    height: '100%',
+    width: `${(timeRemaining / 60) * 100}%`,
+    backgroundColor: timeRemaining > 10 ? '#4caf50' : '#f44336', 
+    transition: 'width 0.1s linear' // Level3の滑らかな更新を維持
+  };
+
+  // メインUI表示（Level2と同じレイアウト）
   return (
     <>
       <div style={{ textAlign: 'center', marginTop: '50px' }}>
@@ -211,72 +248,45 @@ function Level3Screen({ onGoBack, onGoForward }) {
           borderRadius: '8px', 
           boxShadow: '0 2px 4px rgba(0,0,0,0.1)' 
         }}>
-          {/* 問題表示 */}
-          <div style={{ 
-            fontSize: '24px', 
-            fontWeight: 'bold', 
-            textAlign: 'center',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            margin: '20px 0'
-          }}>
-            <span>問題: {numA} × {numB} = </span>
-            <input 
-              type="text" 
-              value={inputValue} 
-              onChange={e => setInputValue(e.target.value)} 
-              onKeyDown={e => { 
-                if (e.key === 'Enter') { 
-                  checkAnswer(); 
-                } 
-              }} 
-              placeholder="答えを入力" 
-              disabled={showHelp} // ポップアップ表示中は入力を無効化
-              style={{ 
-                padding: '10px', 
-                fontSize: '18px', 
-                width: '150px', 
-                borderRadius: '5px', 
-                border: '1px solid #ccc', 
-                marginLeft: '10px',
-                backgroundColor: showHelp ? '#f5f5f5' : '#ffffff',
-                cursor: showHelp ? 'not-allowed' : 'text'
-              }} 
-            />
-          </div>
-          {/* 問題番号表示 */}
+          {/* 問題表示 - Level2と同じスタイル */}
+          <p style={{ fontSize: '24px', fontWeight: 'bold', textAlign: 'center' }}>
+            問題: {numA} × {numB} = <input 
+                type="text" 
+                value={inputValue} 
+                onChange={(e) => setInputValue(e.target.value)} 
+                onKeyDown={(e) => { if (e.key === 'Enter') { checkAnswer(); } }} 
+                placeholder="答えを入力" 
+                style={{ padding: '10px', fontSize: '18px', width: '150px', borderRadius: '5px', border: '1px solid #ccc', marginRight: '10px' }} 
+              />
+          </p>
           <p style={{ textAlign: 'center' }}>問題 {currentQuestionIndex + 1} / {TOTAL_QUESTIONS}</p>
+          
           {/* タイマー表示 */}
           <div>
             <p style={{ 
               textAlign: 'center', 
               marginBottom: '5px',
-              color: showHelp ? '#999' : '#000'
+              color: showHelp ? '#ff6b6b' : '#000' // ポップアップ表示中は赤色で警告
             }}>
-              残り時間: {Math.ceil(timeRemaining)} 秒 {showHelp && '(一時停止中)'}
+              残り時間: {Math.ceil(timeRemaining)} 秒 {showHelp && '(進行中)'}
             </p>
             {/* プログレスバー */}
-            <div style={{ 
-              width: '100%', 
-              height: '20px', 
-              backgroundColor: '#e0e0e0', 
-              borderRadius: '10px', 
-              overflow: 'hidden', 
-              margin: '10px 0 20px 0',
-              opacity: showHelp ? 0.5 : 1
-            }}>
-              <div style={{ 
-                height: '100%', 
-                width: `${(timeRemaining / 60) * 100}%`, 
-                backgroundColor: timeRemaining > 10 ? '#4caf50' : '#f44336', 
-                transition: 'width 0.1s linear', // より短い遷移時間で滑らかに
-                willChange: 'width' // パフォーマンス最適化
-              }}></div>
+            <div style={progressBarContainerStyle}>
+              <div style={progressBarStyle}></div>
             </div>
           </div>
-          {/* 結果表示エリア */}
+          
+          {/* 入力エリア - Level2と同じスタイル */}
           <div style={{ marginTop: '20px', textAlign: 'center' }}>
+            <input 
+                type="text" 
+                value={inputValue} 
+                onChange={(e) => setInputValue(e.target.value)} 
+                onKeyDown={(e) => { if (e.key === 'Enter') { checkAnswer(); } }} 
+                placeholder="答えを入力" 
+                style={{ padding: '10px', fontSize: '18px', width: '150px', borderRadius: '5px', border: '1px solid #ccc', marginRight: '10px' }} 
+              />
+            
             {/* 結果表示 */}
             {result && (
               <p style={{ 
@@ -286,9 +296,11 @@ function Level3Screen({ onGoBack, onGoForward }) {
                 color: result === '正解！' ? 'red' : 'blue' // 正解は赤色、不正解は青色
               }}>{result}</p>
             )}
+            
             {/* ヘルプヒント */}
             <p style={{ fontSize: '0.8em', color: 'gray', marginTop: '20px' }}>
-              ヒント: hキーでヘルプを表示</p>
+              ヒント: hキーでヘルプを表示 | Enterキーで回答
+            </p>
           </div>
         </div>
         {/* ホームに戻るボタン */}

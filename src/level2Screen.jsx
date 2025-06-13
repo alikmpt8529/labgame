@@ -18,9 +18,11 @@ function App() {
   const [result, setResult] = useState(null)
   const [showHelp, setShowHelp] = useState(true); // 初期状態でヒント表示
   const [helpLevel, setHelpLevel] = useState('level2'); // 表示するヒントのレベル
-  const [timeRemaining, setTimeRemaining] = useState(60)
+  const [timeRemaining, setTimeRemaining] = useState(60) // 表示用（整数）
+  const [progressTime, setProgressTime] = useState(60) // プログレスバー用（小数点あり）
   const [timeSpent, setTimeSpent] = useState(0);　//経過時間（秒）
   const timerIdRef = useRef(null)
+  const progressTimerIdRef = useRef(null) // プログレスバー用タイマー
 
   const [questionSequence, setQuestionSequence] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -33,7 +35,6 @@ function App() {
       initializeQuestionSequence();
     }
   }, [screen]);
-
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -48,7 +49,7 @@ function App() {
     };
   }, [screen]);
 
-  // タイマー管理
+  // タイマー管理（1秒間隔 - 表示用）
   useEffect(() => {
     if (screen === 'level2' && !showHelp) { // ヒント表示中はタイマーを止める
       if (timerIdRef.current) {
@@ -58,13 +59,16 @@ function App() {
         setTimeRemaining(prevTime => {
           if (prevTime <= 1) {
             clearInterval(timerIdRef.current);
+            if (progressTimerIdRef.current) {
+              clearInterval(progressTimerIdRef.current);
+            }
             setScreen('home'); // 時間切れでホームへ
             alert('時間切れです！');
             return 0;
           }
           return prevTime - 1;
         });
-      }, 1000);
+      }, 1000); // 1秒間隔
     } else {
       if (timerIdRef.current) {
         clearInterval(timerIdRef.current);
@@ -75,7 +79,35 @@ function App() {
         clearInterval(timerIdRef.current);
       }
     };
-  }, [screen, showHelp]); // showHelpを依存に追加
+  }, [screen, showHelp]);
+
+  // プログレスバー用タイマー管理（100ms間隔）
+  useEffect(() => {
+    if (screen === 'level2' && !showHelp) { // ヒント表示中はタイマーを止める
+      if (progressTimerIdRef.current) {
+        clearInterval(progressTimerIdRef.current);
+      }
+      progressTimerIdRef.current = setInterval(() => {
+        setProgressTime(prevTime => {
+          const newTime = prevTime - 0.1;
+          if (newTime <= 0) {
+            clearInterval(progressTimerIdRef.current);
+            return 0;
+          }
+          return newTime;
+        });
+      }, 100); // 100ms間隔
+    } else {
+      if (progressTimerIdRef.current) {
+        clearInterval(progressTimerIdRef.current);
+      }
+    }
+    return () => {
+      if (progressTimerIdRef.current) {
+        clearInterval(progressTimerIdRef.current);
+      }
+    };
+  }, [screen, showHelp]);
 
   const initializeQuestionSequence = () => {
     const typeSum10Count = 2; // QUESTION_TYPE_SAME_UNITS_TENS_SUM_10 の問題数
@@ -143,6 +175,7 @@ function App() {
     if (screen === 'level2' && questionSequence.length > 0 && currentQuestionIndex < questionSequence.length) {
       generateQuestion();
       setTimeRemaining(60);
+      setProgressTime(60); // プログレス用時間もリセット
     }
   }, [screen, questionSequence, currentQuestionIndex]);
 
@@ -157,7 +190,7 @@ function App() {
 
       if (nextQuestionIndex >= questionSequence.length) {
         setTimeout(() => {
-          alert('クリア時間' + timeSpent + '秒');
+          alert('クリア時間' + Math.round(timeSpent) + '秒');
           setScreen('result');
         }, 1000)
       } else {
@@ -178,6 +211,9 @@ function App() {
       if (timerIdRef.current) {
         clearInterval(timerIdRef.current);
       }
+      if (progressTimerIdRef.current) {
+        clearInterval(progressTimerIdRef.current);
+      }
     }
     setScreen(targetScreen);
   };
@@ -189,7 +225,8 @@ function App() {
       num4={num4}
       num5={num5}
       count={currentQuestionIndex}
-      timeRemaining={timeRemaining}
+      timeRemaining={timeRemaining} // 表示用（整数）
+      progressTime={progressTime} // プログレスバー用（小数点あり）
       inputValue={inputValue}
       setInputValue={setInputValue}
       checkAnswer={checkAnswer}
