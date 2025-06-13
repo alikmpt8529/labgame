@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Level1Screen from './Level1Screen'; // Level1Screenコンポーネントをインポート
 import Level3Screen from './Level3Screen'; // Level3Screenコンポーネントをインポート
+import ResultPage from './ResultPage'; // ResultPageコンポーネントをインポート
 
 function HomeScreen(props) {
   const {
@@ -17,62 +18,47 @@ function HomeScreen(props) {
     result,
     // Help popup props
     showHelp,
-    HelpPopup,
+    setShowHelp,
+    HelpPopup, // App.jsx から渡された HelpPopup コンポーネント
   } = props;
 
-  // ボタンのスタイル
-  const buttonStyle = {
-    margin: '10px',
-    padding: '10px 20px',
-    fontSize: '16px',
-    backgroundColor: '#f0f0f0',
-    border: '1px solid #ccc',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    transition: 'background-color 0.2s ease'
-  };
+  useEffect(() => {
+  if (screen === 'home') {
+    setShowHelp(false);
+  }
+}, [screen, setShowHelp]);
+  // ホーム画面で h キーを押すとヘルプを表示
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (screen === 'home' && event.key === 'h') {
+        setShowHelp(true); // ホーム画面で h キーでヘルプ表示
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [screen, setShowHelp]);
+
   if (screen === 'home') {
     return (
-      <>
-        <div style={{ textAlign: 'center', marginTop: '100px' }}>
-          <h1>インド式計算ゲーム</h1>
-          <p>レベルを選択してください</p>
-          <button
-            onClick={() => onNavigate('level1')}
-            style={buttonStyle}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#d0d0d0'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = '#f0f0f0'}
-          >
-            Level 1
-            <p>⭐</p>
-          </button>
-          <button
-            onClick={() => onNavigate('level2')}
-            style={buttonStyle}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#d0d0d0'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = '#f0f0f0'}
-          >
-            Level 2
-            <p>⭐⭐</p>
-          </button>
-          <button
-            onClick={() => onNavigate('level3')}
-            style={buttonStyle}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#d0d0d0'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = '#f0f0f0'}
-          >
-            Level 3
-            <p>⭐⭐⭐</p>
-          </button>
-        </div>
-
-        {/* CSSスタイルを追加 */}
-        <style jsx>{`
-          button:hover {
-            background-color: #d0d0d0 !important;
-          }
-        `}</style>
-      </>
+      <div style={{ textAlign: 'center', marginTop: '100px' }}>
+        <h1>インド式計算ゲーム</h1>
+        <button onClick={() => onNavigate('level1')} style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>
+          Level 1
+        </button>
+        <button onClick={() => onNavigate('level2')} style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>
+          Level 2
+        </button>
+        <button onClick={() => onNavigate('level3')} style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>
+          Level 3
+        </button>
+        {/* ホーム画面でもヒントキーの案内を表示 */}
+      <p style={{ fontSize: '0.8em', color: 'gray', marginTop: '20px' }}>
+        ヒント: hキーでヘルプを表示
+      </p>
+        {showHelp && HelpPopup && <HelpPopup level="level1" onClose={() => setShowHelp(false)} />} {/* ホーム画面でもヘルプ表示可能に */}
+      </div>
     );
   }
 
@@ -83,8 +69,8 @@ function HomeScreen(props) {
   if (screen === 'level3') {
     return (
       <>
-        <Level3Screen onGoBack={() => onNavigate('home')} />
-        {showHelp && HelpPopup && <HelpPopup level="level3" onClose={() => props.setShowHelp(false)} />}
+        <Level3Screen onGoBack={() => onNavigate('home')} onGoForward={() => onNavigate('result')} />
+        {showHelp && HelpPopup && <HelpPopup level="level3" onClose={() => setShowHelp(false)} />} {/* Level 3 ヘルプ */}
       </>
     );
   }
@@ -142,9 +128,13 @@ function HomeScreen(props) {
           </div>
           <button onClick={() => onNavigate('home')} style={{ marginTop: '30px', padding: '10px 20px' }}>ホームに戻る</button>
         </div>
-        {showHelp && HelpPopup && <HelpPopup level="level2" onClose={() => props.setShowHelp(false)} />}
+        {showHelp && HelpPopup && <HelpPopup level="level2" onClose={() => setShowHelp(false)} />} {/* Level 2 ヘルプ */}
       </>
     );
+  }
+
+  if (screen === 'result') {
+    return <ResultPage onGoBack={() => onNavigate('home')} />;
   }
 
   return null; // 通常は到達しない
