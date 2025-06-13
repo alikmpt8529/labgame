@@ -1,15 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
+import HelpPopup from './HelpPopup';
+
 // 問題タイプの定数定義
 const QUESTION_TYPE_SAME_TENS_UNITS_SUM_10 = 'SAME_TENS_UNITS_SUM_10'; // 十の位が同じ、一の位の和が10
 const QUESTION_TYPE_SAME_TENS_DIFFERENT_UNITS = 'SAME_TENS_DIFFERENT_UNITS'; // 十の位が同じ、一の位が異なる
 const QUESTION_TYPE_UNITS_SAME_TENS_SUM_10 = 'UNITS_SAME_TENS_SUM_10'; // 一の位が同じ、十の位の和が10
 
 const TOTAL_QUESTIONS = 5; // 問題の総数
-/* Level3Screen コンポーネント
- * インド式計算法のLevel3（上級）問題を提供
- * 
- * @param {Function} onGoBack - ホーム画面に戻るためのコールバック関数
- */
+
 function Level3Screen({ onGoBack, onGoForward }) {
   // ステート管理
   const [inputValue, setInputValue] = useState(''); // ユーザーの入力値
@@ -22,6 +20,7 @@ function Level3Screen({ onGoBack, onGoForward }) {
   const timerIdRef = useRef(null); // タイマーID保持用
   const [questionSequence, setQuestionSequence] = useState([]); // 問題の出題順序
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0); // 現在の問題番号
+  
   // ヘルプ表示のキーボードイベント処理
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -38,7 +37,16 @@ function Level3Screen({ onGoBack, onGoForward }) {
     };
   }, []);
 
-  // タイマー管理
+  // Level3開始時にヘルプポップアップを自動表示
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowHelp(true);
+    }, 100); // 0.1秒後に表示
+    
+    return () => clearTimeout(timer);
+  }, []); // 初回のみ実行
+
+  // タイマー管理（より滑らかな更新）
   useEffect(() => {
     // 時間切れの場合の処理
     if (timeRemaining <= 0) {
@@ -53,11 +61,14 @@ function Level3Screen({ onGoBack, onGoForward }) {
     if (timerIdRef.current) {
       clearInterval(timerIdRef.current);
     }
-    // 全問終了していない場合のみタイマーを開始
-    if (currentQuestionIndex < TOTAL_QUESTIONS) {
+    // ポップアップが表示されていない場合のみタイマーを開始
+    if (!showHelp && currentQuestionIndex < TOTAL_QUESTIONS) {
       timerIdRef.current = setInterval(() => {
-        setTimeRemaining(prevTime => prevTime - 1);
-      }, 1000);
+        setTimeRemaining(prevTime => {
+          const newTime = prevTime - 0.1; // 0.1秒ずつ減らす
+          return newTime > 0 ? newTime : 0;
+        });
+      }, 100); // 100ms間隔で更新
     }
     // クリーンアップ関数
     return () => {
@@ -65,12 +76,13 @@ function Level3Screen({ onGoBack, onGoForward }) {
         clearInterval(timerIdRef.current);
       }
     };
-  }, [timeRemaining, onGoBack, currentQuestionIndex]);
+  }, [timeRemaining, onGoBack, currentQuestionIndex, showHelp]);
+
   // 問題シーケンスの初期化
   const initializeQuestionSequence = () => {
     // 各問題タイプの出題数を定義
     const typeSameTensUnitsSum10Count = 2; // 十の位同じ・一の位和10タイプ
-    const typeSameTensDifferentUnitsCount = 2; // 十の位同じ・一の位異なるタイプ
+    const typeSameTensDifferentUnitsCount = 2; // 十の位同じ・一の位異なるタイプ  
     const typeUnitsSameTensSum10Count = 1; // 一の位同じ・十の位和10タイプ
     let sequence = [];
     // 各タイプの問題をシーケンスに追加
@@ -91,6 +103,7 @@ function Level3Screen({ onGoBack, onGoForward }) {
     setQuestionSequence(sequence);
     setCurrentQuestionIndex(0);
   };
+
   // 問題生成ロジック
   const generateQuestion = () => {
     // シーケンスの範囲外チェック
@@ -134,11 +147,13 @@ function Level3Screen({ onGoBack, onGoForward }) {
     setResult(null);
     setTimeRemaining(60); // タイマーリセット
   };
+
   // 副作用管理
   // コンポーネント初期化時に問題シーケンスを設定
   useEffect(() => {
     initializeQuestionSequence();
   }, []);
+
   // 問題インデックス変更時の処理
   useEffect(() => {
     if (questionSequence.length === 0) return;
@@ -156,7 +171,8 @@ function Level3Screen({ onGoBack, onGoForward }) {
       // 結果画面に遷移
       onGoForward();
     }
-  }, [questionSequence, currentQuestionIndex, onGoBack]);
+  }, [questionSequence, currentQuestionIndex, screen]);
+
   // 回答チェック処理
   const checkAnswer = () => {
     // 数値が設定されていない場合は処理しない
@@ -179,102 +195,117 @@ function Level3Screen({ onGoBack, onGoForward }) {
       setResult('不正解');
     }
   };
-  // ローディング状態の表示
-  if (numA === null || numB === null && currentQuestionIndex < TOTAL_QUESTIONS) {
-    return (
-      <div style={{ textAlign: 'center', marginTop: '100px' }}>
-        <p>問題を準備中...</p>
-        <button onClick={onGoBack}>戻る</button>
-      </div>
-    );
-  }
+
   // メインUI表示
   return (
-    <div style={{ textAlign: 'center', marginTop: '50px' }}>
-      {/* ヘッダー */}
-      <h1>レベル3 - インド式計算チャレンジ</h1>
-      {/* メインコンテンツ */}
-      <div style={{ 
-        maxWidth: '600px', 
-        margin: '20px auto', 
-        padding: '20px', 
-        border: '1px solid #ccc', 
-        borderRadius: '8px', 
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)' 
-      }}>
-        {/* 問題表示 */}
-        <p style={{ fontSize: '24px', fontWeight: 'bold', textAlign: 'center' }}>
-          問題: {numA} × {numB} = ?
-        </p>
-        {/* 問題番号表示 */}
-        <p style={{ textAlign: 'center' }}>問題 {currentQuestionIndex + 1} / {TOTAL_QUESTIONS}</p>
-        {/* タイマー表示 */}
-        <div>
-          <p style={{ textAlign: 'center', marginBottom: '5px' }}>残り時間: {timeRemaining} 秒</p>
-          {/* プログレスバー */}
+    <>
+      <div style={{ textAlign: 'center', marginTop: '50px' }}>
+        {/* ヘッダー */}
+        <h1>レベル3 - インド式計算チャレンジ</h1>
+        {/* メインコンテンツ */}
+        <div style={{ 
+          maxWidth: '600px', 
+          margin: '20px auto', 
+          padding: '20px', 
+          border: '1px solid #ccc', 
+          borderRadius: '8px', 
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)' 
+        }}>
+          {/* 問題表示 */}
           <div style={{ 
-            width: '100%', 
-            height: '20px', 
-            backgroundColor: '#e0e0e0', 
-            borderRadius: '10px', 
-            overflow: 'hidden', 
-            margin: '10px 0 20px 0' 
+            fontSize: '24px', 
+            fontWeight: 'bold', 
+            textAlign: 'center',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            margin: '20px 0'
           }}>
+            <span>問題: {numA} × {numB} = </span>
+            <input 
+              type="text" 
+              value={inputValue} 
+              onChange={e => setInputValue(e.target.value)} 
+              onKeyDown={e => { 
+                if (e.key === 'Enter') { 
+                  checkAnswer(); 
+                } 
+              }} 
+              placeholder="答えを入力" 
+              disabled={showHelp} // ポップアップ表示中は入力を無効化
+              style={{ 
+                padding: '10px', 
+                fontSize: '18px', 
+                width: '150px', 
+                borderRadius: '5px', 
+                border: '1px solid #ccc', 
+                marginLeft: '10px',
+                backgroundColor: showHelp ? '#f5f5f5' : '#ffffff',
+                cursor: showHelp ? 'not-allowed' : 'text'
+              }} 
+            />
+          </div>
+          {/* 問題番号表示 */}
+          <p style={{ textAlign: 'center' }}>問題 {currentQuestionIndex + 1} / {TOTAL_QUESTIONS}</p>
+          {/* タイマー表示 */}
+          <div>
+            <p style={{ 
+              textAlign: 'center', 
+              marginBottom: '5px',
+              color: showHelp ? '#999' : '#000'
+            }}>
+              残り時間: {Math.ceil(timeRemaining)} 秒 {showHelp && '(一時停止中)'}
+            </p>
+            {/* プログレスバー */}
             <div style={{ 
-              height: '100%', 
-              width: `${(timeRemaining / 60) * 100}%`, 
-              backgroundColor: timeRemaining > 10 ? '#4caf50' : '#f44336', 
-              transition: 'width 0.5s linear' 
-            }}></div>
+              width: '100%', 
+              height: '20px', 
+              backgroundColor: '#e0e0e0', 
+              borderRadius: '10px', 
+              overflow: 'hidden', 
+              margin: '10px 0 20px 0',
+              opacity: showHelp ? 0.5 : 1
+            }}>
+              <div style={{ 
+                height: '100%', 
+                width: `${(timeRemaining / 60) * 100}%`, 
+                backgroundColor: timeRemaining > 10 ? '#4caf50' : '#f44336', 
+                transition: 'width 0.1s linear', // より短い遷移時間で滑らかに
+                willChange: 'width' // パフォーマンス最適化
+              }}></div>
+            </div>
+          </div>
+          {/* 結果表示エリア */}
+          <div style={{ marginTop: '20px', textAlign: 'center' }}>
+            {/* 結果表示 */}
+            {result && (
+              <p style={{ 
+                marginTop: '15px', 
+                fontSize: '20px', 
+                fontWeight: 'bold', 
+                color: result === '正解！' ? 'red' : 'blue' // 正解は赤色、不正解は青色
+              }}>{result}</p>
+            )}
+            {/* ヘルプヒント */}
+            <p style={{ fontSize: '0.8em', color: 'gray', marginTop: '20px' }}>
+              ヒント: hキーでヘルプを表示</p>
           </div>
         </div>
-        {/* 入力・回答エリア */}
-        <div style={{ marginTop: '20px', textAlign: 'center' }}>
-          {/* 回答入力フィールド */}
-          <input 
-            type="text" 
-            value={inputValue} 
-            onChange={e => setInputValue(e.target.value)} 
-            onKeyDown={e => { 
-              if (e.key === 'Enter') { 
-                checkAnswer(); 
-              } 
-            }} 
-            placeholder="答えを入力" 
-            style={{ 
-              padding: '10px', 
-              fontSize: '18px', 
-              width: '150px', 
-              borderRadius: '5px', 
-              border: '1px solid #ccc', 
-              marginRight: '10px' 
-            }} 
-          />
-          {/* 回答ボタン */}
-          <button 
-            onClick={checkAnswer} 
-            style={{ padding: '10px 15px', fontSize: '18px' }}
-          >回答</button>
-          {/* 結果表示 */}
-          {result && (
-            <p style={{ 
-              marginTop: '15px', 
-              fontSize: '20px', 
-              fontWeight: 'bold', 
-              color: result === '正解！' ? '#4caf50' : '#f44336' 
-            }}>{result}</p>
-          )}
-          {/* ヘルプヒント */}
-          <p style={{ fontSize: '0.8em', color: 'gray', marginTop: '20px' }}>
-            ヒント: hキーでヘルプを表示</p>
-        </div>
+        {/* ホームに戻るボタン */}
+        <button 
+          onClick={onGoBack} 
+          style={{ marginTop: '30px', padding: '10px 20px' }}
+        >リタイア</button>
       </div>
-      {/* ホームに戻るボタン */}
-      <button 
-        onClick={onGoBack} 
-        style={{ marginTop: '30px', padding: '10px 20px' }}
-      >ホームに戻る</button>
-    </div>
+
+      {/* ヘルプポップアップ */}
+      {showHelp && (
+        <HelpPopup 
+          level="level3" 
+          onClose={() => setShowHelp(false)} 
+        />
+      )}
+    </>
   );
 }
 
