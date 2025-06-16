@@ -1,11 +1,14 @@
-import { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import './App.css';
 
-const VedicTutorial = ({ onGoBack }) => {
+const VedicTutorial = ({ onGoBack, HelpPopup }) => {
   const [step, setStep] = useState(0);
   const [input, setInput] = useState('');
   const [message, setMessage] = useState('');
   const [isStepCleared, setIsStepCleared] = useState(false);
   const [practiceProblem, setPracticeProblem] = useState({ num1: 0, num2: 0, answer: 0 });
+  const [showHelp, setShowHelp] = useState(false);
+  const [fromPracticeStep, setFromPracticeStep] = useState(null); // 練習問題から来たステップを記録
 
   const correctAnswers = {
     1: 6,
@@ -106,7 +109,6 @@ const VedicTutorial = ({ onGoBack }) => {
     }
   };
 
-
   const handlePracticeSubmit = () => {
     const userAnswer = parseInt(input, 10);
     if (userAnswer === practiceProblem.answer) {
@@ -127,6 +129,34 @@ const VedicTutorial = ({ onGoBack }) => {
     setMessage('');
   };
 
+  const handletoBack = () => {
+    setFromPracticeStep(step); // 現在の練習問題ステップを記録
+    setStep(4);
+    setInput('');
+    setMessage('');
+    setIsStepCleared(false);
+  }
+
+  const handletoBack2 = () => {
+    setFromPracticeStep(step); // 現在の練習問題ステップを記録
+    setStep(7);
+    setInput('');
+    setMessage('');
+    setIsStepCleared(false);
+  }
+
+  // まとめから練習問題に戻る関数
+  const handleBackToPractice = () => {
+    if (fromPracticeStep) {
+      setStep(fromPracticeStep);
+      setFromPracticeStep(null); // 記録をクリア
+      setInput('');
+      setMessage('');
+      setIsStepCleared(false);
+    }
+  };
+
+  // 戻るボタンの処理
   const handleBack = () => {
     setStep((prev) => Math.max(prev - 1, 0));
     setInput('');
@@ -137,163 +167,209 @@ const VedicTutorial = ({ onGoBack }) => {
   const current = stepContent[step];
 
   return (
-    <div style={{ textAlign: 'center', padding: '40px' }}>
-      <h1>Level 1</h1>
-      {(step===0) && (
-        <>
-          {/* ↓↓↓ classNameを追加 ↓↓↓ */}
-          <h2>{current.question}</h2>
-          <p className="explanation-text" style={{ maxWidth: '600px', margin: '20px auto', fontSize: '18px' }}>{current.explanation}</p>
-          <img src={current.image} alt={`step${step}`} style={{ width: '700px', marginBottom: '20px', borderRadius: '10px' }} />
-          
-          {current.inputRequired && (
-            <>
-              <input
-                type="number"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && !isStepCleared && handleSubmit()}
-                disabled={isStepCleared}
-                style={{ padding: '10px', fontSize: '18px', width: '180px', marginBottom: '10px' }}
-              /><br />
-              <button onClick={handleSubmit} disabled={isStepCleared}>答え合わせ(checkAnswer)</button>
-            </>
-          )}
+    <>
+      <div className="game-container" style={{ textAlign: 'center', padding: '40px' }}>
+        <h1 className="game-title">Level 1</h1>
+        {(step === 0) && (
+          <>
+            <h2>{current.question}</h2>
+            <p className="explanation-text" style={{ maxWidth: '600px', margin: '20px auto', fontSize: '18px' }}>{current.explanation}</p>
+            <img src={current.image} alt={`step${step}`} style={{ width: '700px', marginBottom: '20px', borderRadius: '10px' }} />
 
-          {message && <p style={{ marginTop: '20px', fontSize: '18px', color: message.includes('正解') ? 'green' : 'red' }}>{message}</p>}
+            {current.inputRequired && (
+              <>
+                <input
+                  type="number"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && !isStepCleared && handleSubmit()}
+                  disabled={isStepCleared}
+                  style={{ padding: '10px', fontSize: '18px', width: '180px', marginBottom: '10px' }}
+                /><br />
+                <button onClick={handleSubmit} disabled={isStepCleared}>答え合わせ(checkAnswer)</button>
+              </>
+            )}
 
-          <div style={{ marginTop: '30px' }}>
-            {step > 0 && <button onClick={handleBack} style={{ padding: '8px 16px' }}>← 前へ</button>}
-            {step === 0 && <button onClick={handleNextStep0} style={{ padding: '8px 16px', marginLeft: '10px' }}>次へ →</button>}
+            {message && <p style={{ marginTop: '20px', fontSize: '18px', color: message.includes('正解') ? 'green' : 'red' }}>{message}</p>}
+
+            <div style={{ marginTop: '30px' }}>
+              {step > 0 && <button onClick={handleBack} style={{ padding: '8px 16px' }}>← 前へ</button>}
+              {step === 0 && <button onClick={handleNextStep0} style={{ padding: '8px 16px', marginLeft: '10px' }}>次へ →</button>}
+            </div>
+          </>
+        )}
+        {(step > 0 && step <= 3) && (
+          <>
+            <p className="explanation-text" style={{ maxWidth: '600px', margin: '20px auto', fontSize: '18px' }}>{current.explanation}</p>
+            <img src={current.image} alt={`step${step}`} style={{ width: '700px', marginBottom: '20px', borderRadius: '10px' }} />
+            <h2>{current.question}</h2>
+            {current.inputRequired && (
+              <>
+                <input
+                  type="number"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && !isStepCleared && handleSubmit()}
+                  disabled={isStepCleared}
+                  style={{ padding: '10px', fontSize: '18px', width: '180px', marginBottom: '10px' }}
+                /><br />
+                <button onClick={handleSubmit} disabled={isStepCleared}>答え合わせ(checkAnswer)</button>
+              </>
+            )}
+
+            {message && <p style={{ marginTop: '20px', fontSize: '18px', color: message.includes('正解') ? 'green' : 'red' }}>{message}</p>}
+
+            <div style={{ marginTop: '30px' }}>
+              {step > 0 && <button onClick={handleBack} style={{ padding: '8px 16px' }}>← 前へ</button>}
+              {step === 0 && <button onClick={handleNextStep0} style={{ padding: '8px 16px', marginLeft: '10px' }}>次へ →</button>}
+            </div>
+          </>
+        )}
+
+        {step === 4 && (
+          <>
+            <h2>{current.question}</h2>
+            <p className="explanation-text" style={{ maxWidth: '600px', margin: '20px auto', fontSize: '18px' }}>{current.explanation}</p>
+            <img
+              src={current.image}
+              alt={`step${step}`}
+              style={{ width: '700px', marginBottom: '20px', borderRadius: '10px' }}
+            />
+            
+            {/* ボタンを並べて配置 */}
+            <div style={{ 
+              display: 'flex', 
+              gap: '15px', 
+              justifyContent: 'center',
+              marginTop: '20px',
+              flexWrap: 'wrap'
+            }}>
+              <button
+                onClick={() => setStep(5)}
+                style={{ padding: '10px 20px', fontSize: '16px' }}
+              >
+                練習問題へチャレンジ →
+              </button>
+              
+              {fromPracticeStep && (
+                <button
+                  onClick={handleBackToPractice}
+                  style={{ padding: '10px 20px', fontSize: '16px', backgroundColor: '#4caf50', color: 'white' }}
+                >
+                  練習問題に戻る
+                </button>
+              )}
+            </div>
+          </>
+        )}
+
+        {step === 5 && (
+          <>
+            <h2>練習問題(practice questions)①</h2>
+            <p style={{ maxWidth: '600px', margin: '20px auto', fontSize: '30px' }}>{practiceProblem.num1} × {practiceProblem.num2} = ?</p>
+            <input type="number" value={input} onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handlePracticeSubmit()} disabled={isStepCleared} style={{ padding: '10px', fontSize: '18px', width: '180px', marginBottom: '10px' }} />
+            <br />
+            <button onClick={handlePracticeSubmit}>答え合わせ(checkAnswer)</button>
+            {step > 0 && <button onClick={handletoBack} style={{ padding: '8px 16px' }}>← まとめに戻る</button>}
+
+            {message && <p>{message}</p>}
+          </>
+        )}
+
+        {step === 6 && (
+          <>
+            <h2>練習問題(practice questions)②</h2>
+            <p style={{ maxWidth: '600px', margin: '20px auto', fontSize: '30px' }}>{practiceProblem.num1} × {practiceProblem.num2} = ?</p>
+            <input type="number" value={input} onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handlePracticeSubmit()} disabled={isStepCleared} style={{ padding: '10px', fontSize: '18px', width: '180px', marginBottom: '10px' }} />
+            <br />
+            {step > 0 && <button onClick={handletoBack} style={{ padding: '8px 16px' }}>← まとめに戻る</button>}
+            <button onClick={handlePracticeSubmit}>答え合わせ(checkAnswer)</button>
+            {message && <p>{message}</p>}
+          </>
+        )}
+        {(step === 7) && (
+          <>
+            <p className="explanation-text" style={{ maxWidth: '600px', margin: '20px auto', fontSize: '18px' }}>{current.explanation}</p>
+            <img src={current.image} alt={`step${step}`} style={{ width: '700px', marginBottom: '20px', borderRadius: '10px' }} />
+            <h2>{current.question}</h2>
+            {current.inputRequired && (
+              <>
+                <input
+                  type="number"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && !isStepCleared && handleSubmit()}
+                  disabled={isStepCleared}
+                  style={{ padding: '10px', fontSize: '18px', width: '180px', marginBottom: '10px' }}
+                /><br />
+                <button onClick={handleSubmit} disabled={isStepCleared}>答え合わせ(checkAnswer)</button>
+              </>
+            )}
+
+            {message && <p style={{ marginTop: '20px', fontSize: '18px', color: message.includes('正解') ? 'green' : 'red' }}>{message}</p>}
+
+            {/* Step 7でも練習問題に戻るボタンを追加 */}
+            <div style={{ 
+              display: 'flex', 
+              gap: '15px', 
+              justifyContent: 'center',
+              marginTop: '30px',
+              flexWrap: 'wrap'
+            }}>
+              {step > 0 && <button onClick={handleBack} style={{ padding: '8px 16px' }}>← 前へ</button>}
+              
+              {fromPracticeStep && (
+                <button
+                  onClick={handleBackToPractice}
+                  style={{ padding: '8px 16px', backgroundColor: '#4caf50', color: 'white' }}
+                >
+                  練習問題に戻る
+                </button>
+              )}
+            </div>
+          </>
+        )}
+        {step === 8 && (/*sameTensの問題 */
+          <>
+            <h2>練習問題(practice questions)③</h2>
+            <p style={{ maxWidth: '600px', margin: '20px auto', fontSize: '30px' }}>{practiceProblem.num1} × {practiceProblem.num2} = ?</p>
+            <input type="number" value={input} onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handlePracticeSubmit()} disabled={isStepCleared} style={{ padding: '10px', fontSize: '18px', width: '180px', marginBottom: '10px' }} />
+            <br />
+            <button onClick={handlePracticeSubmit}>答え合わせ(checkAnswer)</button>
+            {step > 0 && <button onClick={handletoBack2} style={{ padding: '8px 16px' }}>← まとめに戻る</button>}
+            {message && <p>{message}</p>}
+          </>
+        )}
+        {step === 9 && (
+          <>
+            <h2>🎉 練習完了！</h2>
+            <p>すべての問題に正解しました！</p>
+            <button onClick={onGoBack}>トップに戻る(return to home)</button>
+          </>
+        )}
+
+        {/* トップに戻るボタンは常に表示 */}
+        {step < 9 && (
+          <div style={{ marginTop: '40px' }}>
+            <button onClick={onGoBack}>トップに戻る(return to home)</button>
           </div>
-        </>
-      )}
-      {(step>0 && step <= 3) && (
-        <>
-          {/* ↓↓↓ classNameを追加 ↓↓↓ */}
-          <p className="explanation-text" style={{ maxWidth: '600px', margin: '20px auto', fontSize: '18px' }}>{current.explanation}</p>
-          <img src={current.image} alt={`step${step}`} style={{ width: '700px', marginBottom: '20px', borderRadius: '10px' }} />
-          <h2>{current.question}</h2>
-          {current.inputRequired && (
-            <>
-              <input
-                type="number"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && !isStepCleared && handleSubmit()}
-                disabled={isStepCleared}
-                style={{ padding: '10px', fontSize: '18px', width: '180px', marginBottom: '10px' }}
-              /><br />
-              <button onClick={handleSubmit} disabled={isStepCleared}>答え合わせ(checkAnswer)</button>
-            </>
-          )}
+        )}
+      </div>
 
-          {message && <p style={{ marginTop: '20px', fontSize: '18px', color: message.includes('正解') ? 'green' : 'red' }}>{message}</p>}
-
-          <div style={{ marginTop: '30px' }}>
-            {step > 0 && <button onClick={handleBack} style={{ padding: '8px 16px' }}>← 前へ</button>}
-            {step === 0 && <button onClick={handleNextStep0} style={{ padding: '8px 16px', marginLeft: '10px' }}>次へ →</button>}
+      {/* ヘルプポップアップ */}
+      {showHelp && HelpPopup && (
+        <div className="help-popup">
+          <div className={`help-popup-content`}>
+            <div className="help-content">
+              <HelpPopup level="level1" onClose={() => setShowHelp(false)} />
+            </div>
           </div>
-        </>
-      )}
-
-      {step === 4 && (
-        <>
-          <h2>{current.question}</h2>
-          {/* ↓↓↓ classNameを追加 ↓↓↓ */}
-          <p className="explanation-text" style={{ maxWidth: '600px', margin: '20px auto', fontSize: '18px' }}>{current.explanation}</p>
-          <img
-            src={current.image}
-            alt={`step${step}`}
-            style={{ width: '700px', marginBottom: '20px', borderRadius: '10px' }}
-          />
-          <button
-            onClick={() => setStep(5)}
-            style={{ marginTop: '20px', padding: '10px 20px', fontSize: '16px' }}
-          >
-            練習問題へチャレンジ →
-          </button>
-        </>
-      )}
-
-
-      {step === 5 && (
-        <>
-          <h2>練習問題(practice questions)①</h2>
-          <p style={{ maxWidth: '600px', margin: '20px auto', fontSize: '30px' }}>{practiceProblem.num1} × {practiceProblem.num2} = ?</p>
-          <input type="number" value={input} onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handlePracticeSubmit()} disabled={isStepCleared} style={{ padding: '10px', fontSize: '18px', width: '180px', marginBottom: '10px' }}/>
-          <br />
-          <button onClick={handlePracticeSubmit}>答え合わせ(checkAnswer)</button>
-          {message && <p>{message}</p>}
-        </>
-      )}
-
-      {step === 6 && (
-        <>
-          <h2>練習問題(practice questions)②</h2>
-          <p style={{ maxWidth: '600px', margin: '20px auto', fontSize: '30px' }}>{practiceProblem.num1} × {practiceProblem.num2} = ?</p>
-          <input type="number" value={input} onChange={(e) => setInput(e.target.value)} 
-          onKeyDown={(e) => e.key === 'Enter' && handlePracticeSubmit()} disabled={isStepCleared} style={{ padding: '10px', fontSize: '18px', width: '180px', marginBottom: '10px' }}/>
-          <br />
-          <button onClick={handlePracticeSubmit}>答え合わせ(checkAnswer)</button>
-          {message && <p>{message}</p>}
-        </>
-      )}
-      {(step === 7) && (
-        <>
-          {/* ↓↓↓ classNameを追加 ↓↓↓ */}
-          <p className="explanation-text" style={{ maxWidth: '600px', margin: '20px auto', fontSize: '18px' }}>{current.explanation}</p>
-          <img src={current.image} alt={`step${step}`} style={{ width: '700px', marginBottom: '20px', borderRadius: '10px' }} />
-          <h2>{current.question}</h2>
-          {current.inputRequired && (
-            <>
-              <input
-                type="number"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && !isStepCleared && handleSubmit()}
-                disabled={isStepCleared}
-                style={{ padding: '10px', fontSize: '18px', width: '180px', marginBottom: '10px' }}
-              /><br />
-              <button onClick={handleSubmit} disabled={isStepCleared}>答え合わせ(checkAnswer)</button>
-            </>
-          )}
-
-          {message && <p style={{ marginTop: '20px', fontSize: '18px', color: message.includes('正解') ? 'green' : 'red' }}>{message}</p>}
-
-          <div style={{ marginTop: '30px' }}>
-            {step > 0 && <button onClick={handleBack} style={{ padding: '8px 16px' }}>← 前へ</button>}
-            {step === 0 && <button onClick={handleNextStep0} style={{ padding: '8px 16px', marginLeft: '10px' }}>次へ →</button>}
-          </div>
-        </>
-      )}
-      {step === 8 && (/*Same10の問題 */
-        <>
-          <h2>練習問題(practice questions)②</h2>
-          <p style={{ maxWidth: '600px', margin: '20px auto', fontSize: '30px' }}>{practiceProblem.num1} × {practiceProblem.num2} = ?</p>
-          <input type="number" value={input} onChange={(e) => setInput(e.target.value)} 
-          onKeyDown={(e) => e.key === 'Enter' && handlePracticeSubmit()} disabled={isStepCleared} style={{ padding: '10px', fontSize: '18px', width: '180px', marginBottom: '10px' }}/>
-          <br />
-          <button onClick={handlePracticeSubmit}>答え合わせ(checkAnswer)</button>
-          {message && <p>{message}</p>}
-        </>
-      )}
-      {step === 9 && (
-        <>
-          <h2>🎉 練習完了！</h2>
-          <p>すべての問題に正解しました！</p>
-          <button onClick={onGoBack}>トップに戻る(return to home)</button>
-        </>
-      )}
-
-      {/* トップに戻るボタンは常に表示 */}
-      {step < 9 && (
-        <div style={{ marginTop: '40px' }}>
-          <button onClick={onGoBack}>トップに戻る(return to home)</button>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
