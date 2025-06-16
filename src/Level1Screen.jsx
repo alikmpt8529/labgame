@@ -9,6 +9,7 @@ const VedicTutorial = ({ onGoBack, HelpPopup }) => {
   const [practiceProblem, setPracticeProblem] = useState({ num1: 0, num2: 0, answer: 0 });
   const [showHelp, setShowHelp] = useState(false);
   const [fromPracticeStep, setFromPracticeStep] = useState(null); // 練習問題から来たステップを記録
+  const [isDarkMode, setIsDarkMode] = useState(false); // ダークモードの状態
 
   const correctAnswers = {
     1: 6,
@@ -256,7 +257,7 @@ const VedicTutorial = ({ onGoBack, HelpPopup }) => {
                   onClick={handleBackToPractice}
                   style={{ padding: '10px 20px', fontSize: '16px', backgroundColor: '#4caf50', color: 'white' }}
                 >
-                  練習問題に戻る
+                  練習問題に戻る→
                 </button>
               )}
             </div>
@@ -325,7 +326,7 @@ const VedicTutorial = ({ onGoBack, HelpPopup }) => {
                   onClick={handleBackToPractice}
                   style={{ padding: '8px 16px', backgroundColor: '#4caf50', color: 'white' }}
                 >
-                  練習問題に戻る
+                  練習問題に戻る→
                 </button>
               )}
             </div>
@@ -347,27 +348,24 @@ const VedicTutorial = ({ onGoBack, HelpPopup }) => {
           <>
             <h2>🎉 練習完了！</h2>
             <p>すべての問題に正解しました！</p>
-            <button onClick={onGoBack}>トップに戻る(return to home)</button>
+            <button onClick={onGoBack}>ホームに戻る(return to home)</button>
           </>
         )}
 
         {/* トップに戻るボタンは常に表示 */}
         {step < 9 && (
           <div style={{ marginTop: '40px' }}>
-            <button onClick={onGoBack}>トップに戻る(return to home)</button>
+            <button onClick={onGoBack}>ホームに戻る(return to home)</button>
           </div>
         )}
       </div>
 
-      {/* ヘルプポップアップ */}
+      {/* HelpPopupを一つだけ表示 */}
       {showHelp && HelpPopup && (
-        <div className="help-popup">
-          <div className={`help-popup-content`}>
-            <div className="help-content">
-              <HelpPopup level="level1" onClose={() => setShowHelp(false)} />
-            </div>
-          </div>
-        </div>
+        <HelpPopup 
+          level="level1" 
+          onClose={() => setShowHelp(false)} 
+        />
       )}
     </>
   );

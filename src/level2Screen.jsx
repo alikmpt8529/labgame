@@ -91,6 +91,9 @@ function Level2Screen({
             : '0 2px 4px rgba(0,0,0,0.1)',
           backgroundColor: isDarkMode ? '#3c3c3c' : '#ffffff'
         }}>
+          <p className={`game-timer level2-timer ${showHelp ? 'help-active' : ''} ${isDarkMode ? 'dark-theme' : 'light-theme'}`}>
+              残り時間(remaining time): {timeRemaining} 秒 {showHelp && '(一時停止中)'}
+            </p>
           {/* 問題表示 */}
           <p className={`game-question level2-question ${isDarkMode ? 'dark-theme' : 'light-theme'}`}>
             問題(Question): {num4} × {num5} = 
@@ -110,9 +113,7 @@ function Level2Screen({
             now {count + 1} / 5
           </p>
           <div>
-            <p className={`game-timer level2-timer ${showHelp ? 'help-active' : ''} ${isDarkMode ? 'dark-theme' : 'light-theme'}`}>
-              残り時間(remaining time): {timeRemaining} 秒 {showHelp && '(一時停止中)'}
-            </p>
+            
             <div className="game-progress-container" style={progressBarContainerStyle}>
               <div style={progressBarStyle}></div>
             </div>
@@ -132,7 +133,7 @@ function Level2Screen({
             <p className="game-hint" style={{ 
               color: isDarkMode ? '#cccccc' : '#666666'
             }}>
-              ヒント: hキーで表示(Hint: Press the h key to display.) | Enterキーで回答
+              ヒント: hキーで表示(Hint: Press the h key to display.) | Enterキーで回答(Press the Enter key to answer.)
             </p>
           </div>
         </div>

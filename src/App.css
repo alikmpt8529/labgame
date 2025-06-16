@@ -1,6 +1,5 @@
-
 #root {
-  max-width: 1280px;
+  max-width: 100%;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
@@ -413,4 +412,24 @@
 
 .game-answer-button:active {
   background-color: #3d8b40 !important;
+}
+
+/* HelpPopup内のタイマー用スタイル */
+.game-timer.level2-timer {
+  display: block;
+  margin: 0 0 15px 0;
+}
+
+.game-timer.level2-timer.help-active {
+  color: #ff6b35;
+}
+
+.game-timer.level2-timer.dark-theme {
+  color: #ffffff;
+  background-color: rgba(45, 45, 48, 0.9) !important;
+}
+
+.game-timer.level2-timer.light-theme {
+  color: #000000;
+  background-color: rgba(255, 255, 255, 0.9) !important;
 }

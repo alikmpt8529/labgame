@@ -263,6 +263,9 @@ function Level3Screen({ onGoBack, onGoForward }) {
             : '0 2px 4px rgba(0,0,0,0.1)',
           backgroundColor: isDarkMode ? '#3c3c3f' : '#ffffff'
         }}>
+          <p className={`level3-timer ${showHelp ? 'help-active' : ''}`}>
+              残り時間(remaining time): {Math.ceil(timeRemaining)} 秒 {showHelp && '(一時停止中)'}
+            </p>
           {/* 問題表示 - Level2と同じスタイル */}
           <p className="level3-question">
             問題(Question):{numA} × {numB} =
@@ -292,9 +295,7 @@ function Level3Screen({ onGoBack, onGoForward }) {
 
           {/* タイマー表示 */}
           <div>
-            <p className={`level3-timer ${showHelp ? 'help-active' : ''}`}>
-              残り時間(remaining time): {Math.ceil(timeRemaining)} 秒 {showHelp && '(一時停止中)'}
-            </p>
+            
             {/* プログレスバー */}
             <div style={progressBarContainerStyle}>
               <div style={progressBarStyle}></div>
@@ -319,7 +320,7 @@ function Level3Screen({ onGoBack, onGoForward }) {
             <p className="game-hint" style={{
               color: isDarkMode ? '#cccccc' : '#666666'
             }}>
-              ヒント: hキーで表示(Hint: Press the h key to display.) | Enterキーで回答
+              ヒント: hキーで表示(Hint: Press the h key to display.) | Enterキーで回答(Answer with the Enter key)
             </p>
           </div>
         </div>
