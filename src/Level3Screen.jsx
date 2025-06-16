@@ -263,9 +263,9 @@ function Level3Screen({ onGoBack, onGoForward }) {
             : '0 2px 4px rgba(0,0,0,0.1)',
           backgroundColor: isDarkMode ? '#3c3c3f' : '#ffffff'
         }}>
-          <p className={`level3-timer ${showHelp ? 'help-active' : ''}`}>
-              残り時間(remaining time): {Math.ceil(timeRemaining)} 秒 {showHelp && '(一時停止中)'}
-            </p>
+          <h3 className={`level3-timer ${showHelp ? 'help-active' : ''}`}>
+              残り時間(remaining time): {Math.ceil(timeRemaining)}  {showHelp && '(一時停止中)'}
+            </h3>
           {/* 問題表示 - Level2と同じスタイル */}
           <p className="level3-question">
             問題(Question):{numA} × {numB} =

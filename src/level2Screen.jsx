@@ -91,9 +91,11 @@ function Level2Screen({
             : '0 2px 4px rgba(0,0,0,0.1)',
           backgroundColor: isDarkMode ? '#3c3c3c' : '#ffffff'
         }}>
-          <p className={`game-timer level2-timer ${showHelp ? 'help-active' : ''} ${isDarkMode ? 'dark-theme' : 'light-theme'}`}>
-              残り時間(remaining time): {timeRemaining} 秒 {showHelp && '(一時停止中)'}
-            </p>
+          <h3 className={`game-timer level2-timer ${showHelp ? 'help-active' : ''} ${isDarkMode ? 'dark-theme' : 'light-theme'}`} style={{
+            color: isDarkMode ? '#ffffff' : '#000000'
+          }}>
+              残り時間(remaining time): {timeRemaining}  {showHelp && '(一時停止中)'}
+            </h3>
           {/* 問題表示 */}
           <p className={`game-question level2-question ${isDarkMode ? 'dark-theme' : 'light-theme'}`}>
             問題(Question): {num4} × {num5} = 
