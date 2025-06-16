@@ -156,7 +156,7 @@ const VedicTutorial = ({ onGoBack }) => {
                 disabled={isStepCleared}
                 style={{ padding: '10px', fontSize: '18px', width: '180px', marginBottom: '10px' }}
               /><br />
-              <button onClick={handleSubmit} disabled={isStepCleared}>答え合わせ</button>
+              <button onClick={handleSubmit} disabled={isStepCleared}>答え合わせ(checkAnswer)</button>
             </>
           )}
 
@@ -184,7 +184,7 @@ const VedicTutorial = ({ onGoBack }) => {
                 disabled={isStepCleared}
                 style={{ padding: '10px', fontSize: '18px', width: '180px', marginBottom: '10px' }}
               /><br />
-              <button onClick={handleSubmit} disabled={isStepCleared}>答え合わせ</button>
+              <button onClick={handleSubmit} disabled={isStepCleared}>答え合わせ(checkAnswer)</button>
             </>
           )}
 
@@ -219,24 +219,24 @@ const VedicTutorial = ({ onGoBack }) => {
 
       {step === 5 && (
         <>
-          <h2>練習問題①</h2>
+          <h2>練習問題(practice questions)①</h2>
           <p style={{ maxWidth: '600px', margin: '20px auto', fontSize: '30px' }}>{practiceProblem.num1} × {practiceProblem.num2} = ?</p>
           <input type="number" value={input} onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handlePracticeSubmit()} disabled={isStepCleared} style={{ padding: '10px', fontSize: '18px', width: '180px', marginBottom: '10px' }}/>
           <br />
-          <button onClick={handlePracticeSubmit}>答え合わせ</button>
+          <button onClick={handlePracticeSubmit}>答え合わせ(checkAnswer)</button>
           {message && <p>{message}</p>}
         </>
       )}
 
       {step === 6 && (
         <>
-          <h2>練習問題②</h2>
+          <h2>練習問題(practice questions)②</h2>
           <p style={{ maxWidth: '600px', margin: '20px auto', fontSize: '30px' }}>{practiceProblem.num1} × {practiceProblem.num2} = ?</p>
           <input type="number" value={input} onChange={(e) => setInput(e.target.value)} 
           onKeyDown={(e) => e.key === 'Enter' && handlePracticeSubmit()} disabled={isStepCleared} style={{ padding: '10px', fontSize: '18px', width: '180px', marginBottom: '10px' }}/>
           <br />
-          <button onClick={handlePracticeSubmit}>答え合わせ</button>
+          <button onClick={handlePracticeSubmit}>答え合わせ(checkAnswer)</button>
           {message && <p>{message}</p>}
         </>
       )}
@@ -256,7 +256,7 @@ const VedicTutorial = ({ onGoBack }) => {
                 disabled={isStepCleared}
                 style={{ padding: '10px', fontSize: '18px', width: '180px', marginBottom: '10px' }}
               /><br />
-              <button onClick={handleSubmit} disabled={isStepCleared}>答え合わせ</button>
+              <button onClick={handleSubmit} disabled={isStepCleared}>答え合わせ(checkAnswer)</button>
             </>
           )}
 
@@ -270,12 +270,12 @@ const VedicTutorial = ({ onGoBack }) => {
       )}
       {step === 8 && (/*Same10の問題 */
         <>
-          <h2>練習問題②</h2>
+          <h2>練習問題(practice questions)②</h2>
           <p style={{ maxWidth: '600px', margin: '20px auto', fontSize: '30px' }}>{practiceProblem.num1} × {practiceProblem.num2} = ?</p>
           <input type="number" value={input} onChange={(e) => setInput(e.target.value)} 
           onKeyDown={(e) => e.key === 'Enter' && handlePracticeSubmit()} disabled={isStepCleared} style={{ padding: '10px', fontSize: '18px', width: '180px', marginBottom: '10px' }}/>
           <br />
-          <button onClick={handlePracticeSubmit}>答え合わせ</button>
+          <button onClick={handlePracticeSubmit}>答え合わせ(checkAnswer)</button>
           {message && <p>{message}</p>}
         </>
       )}
@@ -283,14 +283,14 @@ const VedicTutorial = ({ onGoBack }) => {
         <>
           <h2>🎉 練習完了！</h2>
           <p>すべての問題に正解しました！</p>
-          <button onClick={onGoBack}>トップに戻る</button>
+          <button onClick={onGoBack}>トップに戻る(return to home)</button>
         </>
       )}
 
       {/* トップに戻るボタンは常に表示 */}
       {step < 9 && (
         <div style={{ marginTop: '40px' }}>
-          <button onClick={onGoBack}>トップに戻る</button>
+          <button onClick={onGoBack}>トップに戻る(return to home)</button>
         </div>
       )}
     </div>

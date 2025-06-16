@@ -93,7 +93,7 @@ function Level2Screen({
         }}>
           {/* 問題表示 */}
           <p className={`game-question level2-question ${isDarkMode ? 'dark-theme' : 'light-theme'}`}>
-            問題: {num4} × {num5} = 
+            問題(Question): {num4} × {num5} = 
             <input 
               type="text" 
               value={inputValue} 
@@ -107,12 +107,11 @@ function Level2Screen({
           </p>
           
           <p className={`game-counter level2-counter ${isDarkMode ? 'dark-theme' : 'light-theme'}`}>
-            問題 {count + 1} / 5
+            now {count + 1} / 5
           </p>
-          
           <div>
             <p className={`game-timer level2-timer ${showHelp ? 'help-active' : ''} ${isDarkMode ? 'dark-theme' : 'light-theme'}`}>
-              残り時間: {timeRemaining} 秒 {showHelp && '(一時停止中)'}
+              残り時間(remaining time): {timeRemaining} 秒 {showHelp && '(一時停止中)'}
             </p>
             <div className="game-progress-container" style={progressBarContainerStyle}>
               <div style={progressBarStyle}></div>
@@ -214,7 +213,7 @@ function App() {
               clearInterval(progressTimerIdRef.current);
             }
             setScreen('home'); // 時間切れでホームへ
-            alert('時間切れです！');
+            alert("時間切れです！(Time's up.)");
             return 0;
           }
           return prevTime - 1;
@@ -331,14 +330,14 @@ function App() {
 
   const checkAnswer = () => {
     if (parseInt(inputValue, 10) === answer) {
-      setResult('正解！')
+      setResult('⭕️ 正解！')
       const nextQuestionIndex = currentQuestionIndex + 1;
       setTimeSpent(timeSpent + (60 - timeRemaining));
       setCount(nextQuestionIndex);
 
       if (nextQuestionIndex >= questionSequence.length) {
         setTimeout(() => {
-          alert('クリア時間' + Math.round(timeSpent) + '秒');
+          alert('クリア時間' + timeSpent.toFixed(1) + '秒');
           setScreen('result');
         }, 1000)
       } else {
@@ -347,7 +346,7 @@ function App() {
         }, 1000)
       }
     } else {
-      setResult('不正解')
+      setResult('❌　不正解')
     }
   }
 
