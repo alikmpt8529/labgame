@@ -9,19 +9,6 @@ const QUESTION_TYPE_UNITS_SAME_TENS_SUM_10 = 'UNITS_SAME_TENS_SUM_10'; // 一の
 const TOTAL_QUESTIONS = 5; // 問題の総数
 
 function Level3Screen({ onGoBack, onGoForward }) {
-  // 既存のstateに追加
-  const [isDarkMode, setIsDarkMode] = useState(
-    window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-  );
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (e) => setIsDarkMode(e.matches);
-
-    mediaQuery.addListener(handleChange);
-    return () => mediaQuery.removeListener(handleChange);
-  }, []);
-
   // ステート管理
   const [inputValue, setInputValue] = useState(''); // ユーザーの入力値
   const [numA, setNumA] = useState(null); // 問題の第一の数値
@@ -33,7 +20,7 @@ function Level3Screen({ onGoBack, onGoForward }) {
   const timerIdRef = useRef(null); // タイマーID保持用
   const [questionSequence, setQuestionSequence] = useState([]); // 問題の出題順序
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0); // 現在の問題番号
-
+  
   // ヘルプ表示のキーボードイベント処理
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -43,7 +30,7 @@ function Level3Screen({ onGoBack, onGoForward }) {
     };
     // イベントリスナーの登録
     window.addEventListener('keydown', handleKeyDown);
-
+    
     // クリーンアップ関数（コンポーネントアンマウント時にイベントリスナーを削除）
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
@@ -55,7 +42,7 @@ function Level3Screen({ onGoBack, onGoForward }) {
     const timer = setTimeout(() => {
       setShowHelp(true);
     }, 100); // 0.1秒後に表示
-
+    
     return () => clearTimeout(timer);
   }, []); // 初回のみ実行
 
@@ -216,7 +203,7 @@ function Level3Screen({ onGoBack, onGoForward }) {
     
     if (parseInt(inputValue, 10) === correctAnswer) {
       // 正解の場合
-      setResult('⭕️ 正解！');
+      setResult('正解！');
       const nextQuestionIndex = currentQuestionIndex + 1;
       // 経過時間を更新
       setTimeSpent(timeSpent + (60 - timeRemaining));
@@ -227,7 +214,7 @@ function Level3Screen({ onGoBack, onGoForward }) {
       }, 1000);
     } else {
       // 不正解の場合
-      setResult('❌　不正解');
+      setResult('不正解');
     }
   };
 
@@ -235,7 +222,7 @@ function Level3Screen({ onGoBack, onGoForward }) {
   const progressBarContainerStyle = {
     width: '100%',
     height: '20px',
-    backgroundColor: isDarkMode ? '#555555' : '#e0e0e0',
+    backgroundColor: '#e0e0e0',
     borderRadius: '10px',
     overflow: 'hidden', 
     margin: '10px 0 20px 0' 
@@ -251,69 +238,39 @@ function Level3Screen({ onGoBack, onGoForward }) {
   // メインUI表示（Level2と同じレイアウト）
   return (
     <>
-      <div style={{ 
-        textAlign: 'center', 
-        marginTop: '50px',
-        color: isDarkMode ? '#ffffff' : '#000000',
-        backgroundColor: isDarkMode ? '#2d2d30' : '#ffffff',
-        minHeight: '100vh',
-        transition: 'background-color 0.3s ease, color 0.3s ease'
-      }}>
+      <div style={{ textAlign: 'center', marginTop: '50px' }}>
         {/* ヘッダー */}
-        <h1 style={{ 
-          color: isDarkMode ? '#ffffff' : '#000000',
-          transition: 'color 0.3s ease'
-        }}>
-          レベル3
-        </h1>
+        <h1>レベル3 - インド式計算チャレンジ</h1>
         {/* メインコンテンツ */}
         <div style={{ 
           maxWidth: '600px', 
           margin: '20px auto', 
           padding: '20px', 
-          border: isDarkMode ? '1px solid #555555' : '1px solid #ccc', 
+          border: '1px solid #ccc', 
           borderRadius: '8px', 
-          boxShadow: isDarkMode 
-            ? '0 2px 4px rgba(0,0,0,0.3)' 
-            : '0 2px 4px rgba(0,0,0,0.1)',
-          backgroundColor: isDarkMode ? '#3c3c3c' : '#ffffff',
-          color: isDarkMode ? '#ffffff' : '#000000',
-          transition: 'all 0.3s ease'
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)' 
         }}>
           {/* 問題表示 - Level2と同じスタイル */}
           <p style={{ fontSize: '24px', fontWeight: 'bold', textAlign: 'center' }}>
-            問題(question): {numA} × {numB} = 
-            <input 
-              type="text" 
-              value={inputValue} 
-              onChange={handleInputChange} 
-              onKeyDown={handleKeyDown} 
-              placeholder="答えを入力" 
-              disabled={showHelp}
-              autoFocus={!showHelp}
-              style={{ 
-                padding: '10px', 
-                fontSize: '18px', 
-                width: '150px', 
-                borderRadius: '5px', 
-                border: isDarkMode ? '1px solid #555555' : '1px solid #ccc', 
-                marginRight: '10px',
-                backgroundColor: isDarkMode ? '#5c5c5c' : '#ffffff',
-                color: isDarkMode ? '#ffffff' : '#000000',
-                cursor: showHelp ? 'not-allowed' : 'text'
-              }} 
-            />
+            問題: {numA} × {numB} = <input 
+                type="text" 
+                value={inputValue} 
+                onChange={(e) => setInputValue(e.target.value)} 
+                onKeyDown={(e) => { if (e.key === 'Enter') { checkAnswer(); } }} 
+                placeholder="答えを入力" 
+                style={{ padding: '10px', fontSize: '18px', width: '150px', borderRadius: '5px', border: '1px solid #ccc', marginRight: '10px' }} 
+              />
           </p>
-          <p style={{ textAlign: 'center' }}>now {currentQuestionIndex + 1} / {TOTAL_QUESTIONS}</p>
+          <p style={{ textAlign: 'center' }}>問題 {currentQuestionIndex + 1} / {TOTAL_QUESTIONS}</p>
           
           {/* タイマー表示 */}
           <div>
             <p style={{ 
               textAlign: 'center', 
               marginBottom: '5px',
-              color: showHelp ? '#ff6b6b' : (isDarkMode ? '#ffffff' : '#000000') // ポップアップ表示中は赤色で警告
+              color: showHelp ? '#ff6b6b' : '#000' // ポップアップ表示中は赤色で警告
             }}>
-              残り時間(remaining time): {Math.ceil(timeRemaining)} 秒 {showHelp && '(進行中)'}
+              残り時間: {Math.ceil(timeRemaining)} 秒 {showHelp && '(進行中)'}
             </p>
             {/* プログレスバー */}
             <div style={progressBarContainerStyle}>
@@ -323,20 +280,7 @@ function Level3Screen({ onGoBack, onGoForward }) {
           
           {/* 入力エリア - Level2と同じスタイル */}
           <div style={{ marginTop: '20px', textAlign: 'center' }}>
-            <button 
-              onClick={checkAnswer} 
-              style={{ 
-                padding: '10px 15px', 
-                fontSize: '18px',
-                backgroundColor: isDarkMode ? '#555555' : '#f0f0f0',
-                color: isDarkMode ? '#ffffff' : '#000000',
-                border: isDarkMode ? '1px solid #777777' : '1px solid #cccccc',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              回答
-            </button>
+            <button onClick={checkAnswer} style={{ padding: '10px 15px', fontSize: '18px' }}>回答</button>
             
             {/* 結果表示 */}
             {result && (
@@ -344,43 +288,28 @@ function Level3Screen({ onGoBack, onGoForward }) {
                 marginTop: '15px', 
                 fontSize: '20px', 
                 fontWeight: 'bold', 
-                color: result === '正解！' ? '#4caf50' : '#f44336' // 正解は緑色、不正解は赤色
+                color: result === '正解！' ? 'red' : 'blue' // 正解は赤色、不正解は青色
               }}>{result}</p>
             )}
             
             {/* ヘルプヒント */}
-            <p style={{ 
-              fontSize: '0.8em', 
-              color: isDarkMode ? '#cccccc' : 'gray', 
-              marginTop: '20px' 
-            }}>
-              ヒント: hキーで表示(Tip: Press the h key to display.) | Enterキーで回答( Answer with the Enter key)
+            <p style={{ fontSize: '0.8em', color: 'gray', marginTop: '20px' }}>
+              ヒント: hキーでヘルプを表示 | Enterキーで回答
             </p>
           </div>
         </div>
         {/* ホームに戻るボタン */}
         <button 
           onClick={onGoBack} 
-          style={{ 
-            marginTop: '30px', 
-            padding: '10px 20px',
-            backgroundColor: isDarkMode ? '#555555' : '#f0f0f0',
-            color: isDarkMode ? '#ffffff' : '#000000',
-            border: isDarkMode ? '1px solid #777777' : '1px solid #cccccc',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}
-        >
-          ホームに戻る(return to home)
-        </button>
+          style={{ marginTop: '30px', padding: '10px 20px' }}
+        >リタイア</button>
       </div>
 
       {/* ヘルプポップアップ */}
       {showHelp && (
         <HelpPopup 
           level="level3" 
-          onClose={() => setShowHelp(false)}
-          isDarkMode={isDarkMode}
+          onClose={() => setShowHelp(false)} 
         />
       )}
     </>

@@ -27,11 +27,10 @@ function HomeScreen(props) {
   } = props;
 
   useEffect(() => {
-    if (screen === 'home') {
-      setShowHelp(false);
-    }
-  }, [screen, setShowHelp]);
-
+  if (screen === 'home') {
+    setShowHelp(false);
+  }
+}, [screen, setShowHelp]);
   // ホーム画面で h キーを押すとヘルプを表示
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -49,9 +48,6 @@ function HomeScreen(props) {
     return (
       <div style={{ textAlign: 'center', marginTop: '100px' }}>
         <h1>インド式計算ゲーム</h1>
-        <p>Indian calculation game</p>
-        <h2>レベルを選択してください</h2>
-        <p>Please select a level.</p>
         <button onClick={() => onNavigate('level1')} style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>
           Level 1
         </button>
@@ -62,16 +58,25 @@ function HomeScreen(props) {
           Level 3
         </button>
         {/* ホーム画面でもヒントキーの案内を表示 */}
-        <p style={{ fontSize: '0.8em', color: 'gray', marginTop: '20px' }}>
-          ヒント: hキーでヘルプを表示
-        </p>
-        {showHelp && HelpPopup && <HelpPopup level="level1" onClose={() => setShowHelp(false)} />}
+      <p style={{ fontSize: '0.8em', color: 'gray', marginTop: '20px' }}>
+        ヒント: hキーでヘルプを表示
+      </p>
+        {showHelp && HelpPopup && <HelpPopup level="level1" onClose={() => setShowHelp(false)} />} {/* ホーム画面でもヘルプ表示可能に */}
       </div>
     );
   }
 
   if (screen === 'level1') {
     return <Level1Screen onGoBack={() => onNavigate('home')} />;
+  }
+
+  if (screen === 'level3') {
+    return (
+      <>
+        <Level3Screen onGoBack={() => onNavigate('home')} onGoForward={(page) => onNavigate(page)} />
+        {showHelp && HelpPopup && <HelpPopup level="level3" onClose={() => setShowHelp(false)} />} {/* Level 3 ヘルプ */}
+      </>
+    );
   }
 
   if (screen === 'level2') {
@@ -110,6 +115,7 @@ function HomeScreen(props) {
             </p>
             <p style={{ textAlign: 'center' }}>問題 {count + 1} / 5</p>
             <div>
+              
               <p style={{ 
                 textAlign: 'center', 
                 marginBottom: '5px',
@@ -122,6 +128,7 @@ function HomeScreen(props) {
               </div>
             </div>
             <div style={{ marginTop: '20px', textAlign: 'center' }}>
+              
               <button onClick={checkAnswer} style={{ padding: '10px 15px', fontSize: '18px' }}>回答</button>
               {result && (
                 <p style={{ marginTop: '15px', fontSize: '20px', fontWeight: 'bold', color: result === '正解！' ? '#4caf50' : '#f44336' }}>
@@ -134,15 +141,6 @@ function HomeScreen(props) {
           <button onClick={() => onNavigate('home')} style={{ marginTop: '30px', padding: '10px 20px' }}>ホームに戻る</button>
         </div>
         {showHelp && HelpPopup && <HelpPopup level="level2" onClose={() => setShowHelp(false)} />}
-      </>
-    );
-  }
-
-  if (screen === 'level3') {
-    return (
-      <>
-        <Level3Screen onGoBack={() => onNavigate('home')} onGoForward={(page) => onNavigate(page)} />
-        {showHelp && HelpPopup && <HelpPopup level="level3" onClose={() => setShowHelp(false)} />}
       </>
     );
   }
