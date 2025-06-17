@@ -5,8 +5,8 @@ import HomeScreen from './HomeScreen'; // HomeScreenコンポーネントをイ�
 import OriginalHelpPopup from './HelpPopup'; // HelpPopupコンポーネントをインポート（名前を変更）
 
 // 問題タイプ定数
+const QUESTION_TYPE_SAME_TENS_UNITS_SUM_10 = 'SAME_TENS_UNITS_SUM_10'; // 十の位が同じ、一の位の和が10
 const QUESTION_TYPE_SAME_TENS_DIFFERENT_UNITS = 'SAME_TENS_DIFFERENT_UNITS'; // 十の位が同じ、一の位が異なる
-const QUESTION_TYPE_UNITS_SAME_TENS_SUM_10 = 'UNITS_SAME_TENS_SUM_10'; // 一の位が同じ、十の位の和が10
 
 // Level2画面コンポーネント
 function Level2Screen({
@@ -162,15 +162,15 @@ function Level2Screen({
 
 // 以下のAppコンポーネントは既存のコードと同じ
 function App() {
-  // 画面状態: 'home', 'game', 'level1', 'level3'
+  // 画面状態: 'home', 'game', 'level1', 'level2', 'level3', 'result', 'resultB', 'resultC', 'resultD'
   const [screen, setScreen] = useState('home')
   const [count, setCount] = useState(0)
   const [inputValue, setInputValue] = useState('')
   const [num4, setNum4] = useState(0);
   const [num5, setNum5] = useState(0);
   const [result, setResult] = useState(null)
-  const [showHelp, setShowHelp] = useState(true); // 初期状態でヒント表示
-  const [helpLevel, setHelpLevel] = useState('level2'); // 表示するヒントのレベル
+  const [showHelp, setShowHelp] = useState(false); // 初期状態でヒント非表示
+  const [helpLevel, setHelpLevel] = useState('level1'); // 表示するヒントのレベル
   const [timeRemaining, setTimeRemaining] = useState(60) // 表示用（整数）
   const [progressTime, setProgressTime] = useState(60) // プログレスバー用（小数点あり）
   const [timeSpent, setTimeSpent] = useState(0);　//経過時間（秒）
@@ -189,10 +189,11 @@ function App() {
     }
   }, [screen]);
 
+  // hキーでのヘルプ表示
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if ((screen === 'level2' || screen === 'level3') && event.key === 'h') {
-        setHelpLevel(screen); // 現在のレベルをヒントレベルに
+      if (screen === 'level2' && event.key === 'h') {
+        setHelpLevel('level2'); // 現在のレベルをヒントレベルに
         setShowHelp(true);
       }
     };
@@ -204,7 +205,7 @@ function App() {
 
   // タイマー管理（1秒間隔 - 表示用）
   useEffect(() => {
-    if (screen === 'level2' && !showHelp) { // ヘルプ表示中はタイマーを止める
+    if (screen === 'level2' && !showHelp) { // ヒント表示中はタイマーを止める
       if (timerIdRef.current) {
         clearInterval(timerIdRef.current);
       }
@@ -216,7 +217,7 @@ function App() {
               clearInterval(progressTimerIdRef.current);
             }
             setScreen('home'); // 時間切れでホームへ
-            alert("時間切れです！(Time's up.)");
+            alert('時間切れです！');
             return 0;
           }
           return prevTime - 1;
@@ -236,7 +237,7 @@ function App() {
 
   // プログレスバー用タイマー管理（100ms間隔）
   useEffect(() => {
-    if (screen === 'level2' && !showHelp) { // ヘルプ表示中はタイマーを止める
+    if (screen === 'level2' && !showHelp) { // ヒント表示中はタイマーを止める
       if (progressTimerIdRef.current) {
         clearInterval(progressTimerIdRef.current);
       }
@@ -263,10 +264,10 @@ function App() {
   }, [screen, showHelp]);
 
   const initializeQuestionSequence = () => {
-    const typeSum10Count = 2; // QUESTION_TYPE_UNITS_SAME_TENS_SUM_10 の問題数
+    const typeSum10Count = 2; // QUESTION_TYPE_SAME_TENS_UNITS_SUM_10 の問題数
     const typeDifferentUnitsCount = 3; // QUESTION_TYPE_SAME_TENS_DIFFERENT_UNITS の問題数
     let sequence = [];
-    for (let i = 0; i < typeSum10Count; i++) sequence.push(QUESTION_TYPE_UNITS_SAME_TENS_SUM_10);
+    for (let i = 0; i < typeSum10Count; i++) sequence.push(QUESTION_TYPE_SAME_TENS_UNITS_SUM_10);
     for (let i = 0; i < typeDifferentUnitsCount; i++) sequence.push(QUESTION_TYPE_SAME_TENS_DIFFERENT_UNITS);
 
     // Fisher-Yates shuffle でシーケンスをシャッフル
@@ -277,6 +278,7 @@ function App() {
     setQuestionSequence(sequence);
     setCurrentQuestionIndex(0);
     setCount(0);
+    setTimeSpent(0);
   };
 
   const generateQuestion = () => {
@@ -287,17 +289,19 @@ function App() {
     const currentQuestionType = questionSequence[currentQuestionIndex];
     let n4Value, n5Value;
 
-    if (currentQuestionType === QUESTION_TYPE_UNITS_SAME_TENS_SUM_10) {
-      // 一の位が同じ、十の位の和が10のパターン（例：23 × 73）
-      const commonUnit = Math.floor(Math.random() * 9) + 1; // 共通の一の位
-      const ten1 = Math.floor(Math.random() * 9) + 1; // 第一の数の十の位
-      const ten2 = 10 - ten1; // 第二の数の十の位（和が10になる）
-      n4Value = ten1 * 10 + commonUnit;
-      n5Value = ten2 * 10 + commonUnit;
+    if (currentQuestionType === QUESTION_TYPE_SAME_TENS_UNITS_SUM_10) {
+      // 十の位が同じ、一の位の和が10のパターン
+      const commonTens = Math.floor(Math.random() * 9) + 1; // 共通の十の位
+      const unit1 = Math.floor(Math.random() * 9) + 1; // 第一の数の一の位
+      const unit2 = 10 - unit1; // 第二の数の一の位（和が10になる）
+      n4Value = commonTens * 10 + unit1;
+      n5Value = commonTens * 10 + unit2;
     } else if (currentQuestionType === QUESTION_TYPE_SAME_TENS_DIFFERENT_UNITS) {
-      const commonTens = Math.floor(Math.random() * 9) + 1;
+      // 十の位が同じ、一の位が異なるパターン
+      const commonTens = Math.floor(Math.random() * 9) + 1; // 共通の十の位
       let unit1 = Math.floor(Math.random() * 9) + 1;
       let unit2 = Math.floor(Math.random() * 9) + 1;
+      // 一の位が同じか和が10になる場合は再生成
       while (unit1 === unit2 || (unit1 + unit2 === 10)) {
         unit1 = Math.floor(Math.random() * 9) + 1;
         unit2 = Math.floor(Math.random() * 9) + 1;
@@ -333,15 +337,18 @@ function App() {
 
   const checkAnswer = () => {
     if (parseInt(inputValue, 10) === answer) {
-      setResult('⭕️ 正解！')
+      setResult('正解！')
       const nextQuestionIndex = currentQuestionIndex + 1;
       setTimeSpent(timeSpent + (60 - timeRemaining));
       setCount(nextQuestionIndex);
 
       if (nextQuestionIndex >= questionSequence.length) {
         setTimeout(() => {
-          alert('クリア時間' + timeSpent.toFixed(1) + '秒');
-          setScreen('result');
+          alert('クリア時間' + Math.round(timeSpent + (60 - timeRemaining)) + '秒\nRANK A : ~45秒\nRANK B : ~85秒\nRANK C : ~125秒\nRANK D : 126秒~');
+          if (Math.round(timeSpent + (60 - timeRemaining)) < 46) setScreen('result');
+          else if (Math.round(timeSpent + (60 - timeRemaining)) < 86) setScreen('resultB');
+          else if (Math.round(timeSpent + (60 - timeRemaining)) < 126) setScreen('resultC');
+          else setScreen('resultD')
         }, 1000)
       } else {
         setTimeout(() => {
@@ -349,7 +356,7 @@ function App() {
         }, 1000)
       }
     } else {
-      setResult('❌　不正解')
+      setResult('不正解')
     }
   }
 
@@ -396,8 +403,8 @@ function App() {
       num4={num4}
       num5={num5}
       count={currentQuestionIndex}
-      timeRemaining={timeRemaining}
-      progressTime={progressTime}
+      timeRemaining={timeRemaining} // 表示用（整数）
+      progressTime={progressTime} // プログレスバー用（小数点あり）
       inputValue={inputValue}
       setInputValue={setInputValue}
       checkAnswer={checkAnswer}
@@ -406,7 +413,7 @@ function App() {
       setShowHelp={setShowHelp}
       HelpPopup={({ level, ...otherProps }) => (
         <OriginalHelpPopup 
-          level={helpLevel}
+          level={helpLevel} // ボタン操作またはキー入力に応じてレベル変更可
           onClose={() => setShowHelp(false)} 
           {...otherProps} 
         />
