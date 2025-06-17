@@ -337,7 +337,7 @@ function App() {
 
   const checkAnswer = () => {
     if (parseInt(inputValue, 10) === answer) {
-      setResult('正解！')
+      setResult('⚪︎　正解！')
       const nextQuestionIndex = currentQuestionIndex + 1;
       setTimeSpent(timeSpent + (60 - timeRemaining));
       setCount(nextQuestionIndex);
@@ -356,7 +356,7 @@ function App() {
         }, 1000)
       }
     } else {
-      setResult('不正解')
+      setResult('× 不正解')
     }
   }
 
