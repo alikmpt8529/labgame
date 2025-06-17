@@ -124,6 +124,7 @@ function App() {
     setQuestionSequence(sequence);
     setCurrentQuestionIndex(0);
     setCount(0);
+    setTimeSpent(0);
   };
 
   const generateQuestion = () => {
@@ -190,8 +191,11 @@ function App() {
 
       if (nextQuestionIndex >= questionSequence.length) {
         setTimeout(() => {
-          alert('クリア時間' + Math.round(timeSpent) + '秒');
-          setScreen('result');
+          alert('クリア時間' + Math.round(timeSpent + (60 - timeRemaining)) + '秒\nRANK A : ~45秒\nRANK B : ~85秒\nRANK C : ~125秒\nRANK D : 126秒~');
+          if (Math.round(timeSpent + (60 - timeRemaining)) < 46) setScreen('result');
+          else if (Math.round(timeSpent + (60 - timeRemaining)) < 86) setScreen('resultB');
+          else if (Math.round(timeSpent + (60 - timeRemaining)) < 126) setScreen('resultC');
+          else setScreen('resultD')
         }, 1000)
       } else {
         setTimeout(() => {

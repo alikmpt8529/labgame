@@ -166,9 +166,11 @@ function Level3Screen({ onGoBack, onGoForward }) {
       if (timerIdRef.current) {
         clearInterval(timerIdRef.current);
       }
-      alert('クリア時間' + timeSpent + '秒');
-      // 結果画面に遷移
-      onGoForward();
+      alert('クリア時間' + Math.round(timeSpent) + '秒\nRANK A : ~40秒\nRANK B : ~80秒\nRANK C : ~120秒\nRANK D : 121秒~');
+      if (Math.round(timeSpent) < 41) onGoForward('result');
+      else if (Math.round(timeSpent) < 81) onGoForward('resultB');
+      else if (Math.round(timeSpent) < 121) onGoForward('resultC');
+      else onGoForward('resultD');
     }
   }, [questionSequence, currentQuestionIndex]);
 

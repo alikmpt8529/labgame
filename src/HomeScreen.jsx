@@ -2,6 +2,9 @@ import React, { useEffect } from 'react';
 import Level1Screen from './Level1Screen'; // Level1Screenコンポーネントをインポート
 import Level3Screen from './Level3Screen'; // Level3Screenコンポーネントをインポート
 import ResultPage from './ResultPage'; // ResultPageコンポーネントをインポート
+import ResultPageB from './ResultPageB';
+import ResultPageC from './ResultPageC';
+import ResultPageD from './ResultPageD';
 
 function HomeScreen(props) {
   const {
@@ -70,7 +73,7 @@ function HomeScreen(props) {
   if (screen === 'level3') {
     return (
       <>
-        <Level3Screen onGoBack={() => onNavigate('home')} onGoForward={() => onNavigate('result')} />
+        <Level3Screen onGoBack={() => onNavigate('home')} onGoForward={(page) => onNavigate(page)} />
         {showHelp && HelpPopup && <HelpPopup level="level3" onClose={() => setShowHelp(false)} />} {/* Level 3 ヘルプ */}
       </>
     );
@@ -144,6 +147,18 @@ function HomeScreen(props) {
 
   if (screen === 'result') {
     return <ResultPage onGoBack={() => onNavigate('home')} />;
+  }
+
+  if (screen === 'resultB') {
+    return <ResultPageB onGoBack={() => onNavigate('home')} />;
+  }
+
+  if (screen === 'resultC') {
+    return <ResultPageC onGoBack={() => onNavigate('home')} />;
+  }
+
+  if (screen === 'resultD') {
+    return <ResultPageD onGoBack={() => onNavigate('home')} />;
   }
 
   return null; // 通常は到達しない
