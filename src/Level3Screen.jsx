@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import HelpPopup from './HelpPopup';
+import './animation.css'; // アニメーションCSSをインポート
 
 // 問題タイプの定数定義
 const QUESTION_TYPE_SAME_TENS_UNITS_SUM_10 = 'SAME_TENS_UNITS_SUM_10'; // 十の位が同じ、一の位の和が10
@@ -35,6 +36,12 @@ function Level3Screen({ onGoBack, onGoForward }) {
   const timerIdRef = useRef(null); // タイマーID保持用
   const [questionSequence, setQuestionSequence] = useState([]); // 問題の出題順序
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0); // 現在の問題番号
+  
+  // 全画面アニメーション関連のstate
+  const [showFullscreenAnimation, setShowFullscreenAnimation] = useState(false);
+  const [animationType, setAnimationType] = useState('');
+  const [isProcessingAnswer, setIsProcessingAnswer] = useState(false); // 回答処理中フラグ
+  const animationTimeoutRef = useRef(null); // タイマーID保持用（アニメーション専用）
   
   // ヘルプ表示のキーボードイベント処理
   useEffect(() => {
@@ -204,39 +211,124 @@ function Level3Screen({ onGoBack, onGoForward }) {
     }
   };
 
-  // キーボード入力処理
+  // キーボード入力処理を修正
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && inputValue.trim() !== '') {
-      checkAnswer();
+    // ヘルプ表示中は入力を無効化
+    if (showHelp) {
+      e.preventDefault();
+      return;
     }
+    
+    // アニメーション表示中は入力を無効化
+    if (showFullscreenAnimation) {
+      e.preventDefault();
+      return;
+    }
+    
+    // Enterキーでの回答送信
+    if (e.key === 'Enter') {
+      e.preventDefault(); // デフォルト動作を防止
+      if (inputValue.trim() !== '') {
+        checkAnswer();
+      }
+      return;
+    }
+    
+    // hキーでヘルプ表示
+    if (e.key === 'h' || e.key === 'H') {
+      e.preventDefault();
+      setShowHelp(true);
+      return;
+    }
+    
     // 数字、Backspace、Delete、Arrow keys、Tabのみ許可
     if (!/[\d]/.test(e.key) && 
-        !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter'].includes(e.key)) {
+        !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)) {
       e.preventDefault();
     }
   };
 
-  // 回答チェック処理
+  // 回答チェック処理を修正
   const checkAnswer = () => {
+    console.log('checkAnswer called'); // デバッグ用
+    console.log('numA:', numA, 'numB:', numB, 'inputValue:', inputValue); // デバッグ用
+    
     // 数値が設定されていない場合は処理しない
-    if (numA === null || numB === null || inputValue.trim() === '') return;
+    if (numA === null || numB === null || inputValue.trim() === '') {
+      console.log('Invalid input or numbers not set'); // デバッグ用
+      return;
+    }
+    
+    // アニメーション表示中は処理しない
+    if (showFullscreenAnimation) {
+      console.log('Animation in progress'); // デバッグ用
+      return;
+    }
+    
+    const userAnswer = parseInt(inputValue, 10);
     const correctAnswer = numA * numB;
     
-    if (parseInt(inputValue, 10) === correctAnswer) {
+    console.log('User answer:', userAnswer, 'Correct answer:', correctAnswer); // デバッグ用
+    
+    if (userAnswer === correctAnswer) {
       // 正解の場合
-      setResult('⚪︎　正解！');
+      console.log('Correct answer!'); // デバッグ用
+      setResult('正解！');
+      setShowFullscreenAnimation(true);
+      setAnimationType('correct');
       const nextQuestionIndex = currentQuestionIndex + 1;
       // 経過時間を更新
       setTimeSpent(timeSpent + (60 - timeRemaining));
       
-      // 1秒後に次の問題へ進む
+      // 1.5秒後に次の問題へ進む
       setTimeout(() => {
-        setCurrentQuestionIndex(nextQuestionIndex);
-      }, 1500); // 遅延時間を1000ミリ秒 (1秒) から1500ミリ秒 (1.5秒) に変更
+        setShowFullscreenAnimation(false);
+        if (nextQuestionIndex >= TOTAL_QUESTIONS) {
+          // 全問終了
+          alert('ゲームクリア！');
+          onGoBack();
+        } else {
+          setCurrentQuestionIndex(nextQuestionIndex);
+        }
+      }, 1500);
     } else {
       // 不正解の場合
-      setResult('×　不正解');
+      console.log('Incorrect answer!'); // デバッグ用
+      setResult('不正解');
+      setShowFullscreenAnimation(true);
+      setAnimationType('incorrect');
+      
+      setTimeout(() => {
+        setShowFullscreenAnimation(false);
+      }, 1000);
     }
+  };
+
+  // 全画面アニメーションコンポーネント
+  const FullscreenAnimation = () => {
+    if (!showFullscreenAnimation) return null;
+    
+    return (
+      <div 
+        className={`fullscreen-animation-overlay ${isDarkMode ? 'dark' : ''}`}
+        onClick={() => {
+          // クリックでアニメーション終了
+          setShowFullscreenAnimation(false);
+        }}
+      >
+        <div className="fullscreen-animation-content">
+          <div className={`fullscreen-circle ${animationType}`}>
+            {animationType === 'correct' ? '⚪︎' : '×'}
+          </div>
+          <div className={`fullscreen-text ${animationType}`}>
+            {animationType === 'correct' ? '正解！' : '不正解'}
+          </div>
+          <div className="fullscreen-hint">
+            クリックで閉じる
+          </div>
+        </div>
+      </div>
+    );
   };
 
   // Level2と同じUIを使用
@@ -293,9 +385,9 @@ function Level3Screen({ onGoBack, onGoForward }) {
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
               placeholder="答えを入力" 
-              disabled={showHelp}
-              autoFocus={!showHelp}
-              className={`game-input ${showHelp ? 'input-disabled' : ''} ${isDarkMode ? 'dark-theme' : 'light-theme'}`}
+              disabled={showHelp || showFullscreenAnimation} // アニメーション中も無効化
+              autoFocus={!showHelp && !showFullscreenAnimation}
+              className={`game-input ${showHelp || showFullscreenAnimation ? 'input-disabled' : ''} ${isDarkMode ? 'dark-theme' : 'light-theme'}`}
             />
           </p>
           
@@ -304,15 +396,22 @@ function Level3Screen({ onGoBack, onGoForward }) {
           </p>
           
           <div className="game-input-section">
-            {result && (
-              <p className="game-result" style={{ 
-                color: result === '正解！' 
-                  ? (isDarkMode ? '#ff6b6b' : '#d32f2f')
-                  : (isDarkMode ? '#4dabf7' : '#1976d2')
-              }}>
-                {result}
-              </p>
-            )}
+            <button 
+              onClick={checkAnswer}
+              disabled={showHelp || showFullscreenAnimation || inputValue.trim() === ''}
+              style={{
+                padding: '10px 20px',
+                fontSize: '16px',
+                backgroundColor: (showHelp || showFullscreenAnimation || inputValue.trim() === '') ? '#ccc' : '#4caf50',
+                color: 'white',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: (showHelp || showFullscreenAnimation || inputValue.trim() === '') ? 'not-allowed' : 'pointer',
+                marginBottom: '15px'
+              }}
+            >
+              回答する
+            </button>
             
             {/* プログレスバーを緑色に変更 */}
             <div style={{
@@ -334,7 +433,7 @@ function Level3Screen({ onGoBack, onGoForward }) {
             <p className="game-hint" style={{ 
               color: isDarkMode ? '#cccccc' : '#666666'
             }}>
-              ヒント: hキーで表示(Hint: Press the h key to display.) | Enterキーで回答(Press the Enter key to answer.)
+              ヒント: hキーで表示 | Enterキーまたは回答ボタンで回答
             </p>
           </div>
         </div>
@@ -352,6 +451,9 @@ function Level3Screen({ onGoBack, onGoForward }) {
           ホームに戻る(return to home)
         </button>
       </div>
+
+      {/* 全画面アニメーション */}
+      <FullscreenAnimation />
 
       {/* HelpPopupを一つだけ表示 */}
       {showHelp && (
