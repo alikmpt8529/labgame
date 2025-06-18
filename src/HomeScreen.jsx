@@ -1,10 +1,15 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import Level1Screen from './Level1Screen'; // Level1Screenコンポーネントをインポート
 import Level3Screen from './Level3Screen'; // Level3Screenコンポーネントをインポート
 import ResultPage from './ResultPage'; // ResultPageコンポーネントをインポート
 import ResultPageB from './ResultPageB';
 import ResultPageC from './ResultPageC';
 import ResultPageD from './ResultPageD';
+
+const audio = new Audio('/audio/MusMus-BGM-141.mp3');
+audio.loop = true;
+audio.volume = 0.5;
+let isAudioPlaying = false; // BGMが再生中かを管理する変数
 
 function HomeScreen(props) {
   const {
@@ -25,6 +30,17 @@ function HomeScreen(props) {
     setShowHelp,
     HelpPopup,
   } = props;
+
+    // ボタンがクリックされたときの新しい処理
+  const handleNavigate = (level) => {
+    // もしBGMがまだ再生されていなければ、再生を開始する
+    if (!isAudioPlaying) {
+      audio.play().catch(e => console.error("再生エラー:", e));
+      isAudioPlaying = true; // 再生中にする
+    }
+    // 元々の画面遷移処理を呼び出す
+    onNavigate(level);
+  };
 
   useEffect(() => {
   if (screen === 'home') {
@@ -48,13 +64,13 @@ function HomeScreen(props) {
     return (
       <div style={{ textAlign: 'center', marginTop: '100px' }}>
         <h1>インド式計算ゲーム</h1>
-        <button onClick={() => onNavigate('level1')} style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>
+        <button onClick={() => handleNavigate('level1')} style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>
           Level 1
         </button>
-        <button onClick={() => onNavigate('level2')} style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>
+        <button onClick={() => handleNavigate('level2')} style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>
           Level 2
         </button>
-        <button onClick={() => onNavigate('level3')} style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>
+        <button onClick={() => handleNavigate('level3')} style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>
           Level 3
         </button>
         {/* ホーム画面でもヒントキーの案内を表示 */}
