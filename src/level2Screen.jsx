@@ -124,9 +124,9 @@ function Level2Screen({
           <div className="game-input-section">
             {result && (
               <p className="game-result" style={{ 
-                color: result === '正解！' 
-                  ? (isDarkMode ? '#ff6b6b' : '#d32f2f')
-                  : (isDarkMode ? '#4dabf7' : '#1976d2')
+                color: result.includes('正解') 
+                  ? (isDarkMode ? '#ff6b6b' : '#d32f2f') // 正解は赤色
+                  : (isDarkMode ? '#4dabf7' : '#1976d2') // 不正解は青色
               }}>
                 {result}
               </p>
