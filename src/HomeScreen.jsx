@@ -78,7 +78,7 @@ function HomeScreen(props) {
         </button>
         {/* ホーム画面でもヒントキーの案内を表示 */}
       <p style={{ fontSize: '0.8em', color: 'gray', marginTop: '20px' }}>
-        ヒント: hキーでヘルプを表示
+       ヒント: hキーで表示(Hint: Press the h key to display.)
       </p>
         {showHelp && HelpPopup && <HelpPopup level="level1" onClose={() => setShowHelp(false)} />} {/* ホーム画面でもヘルプ表示可能に */}
       <p style={{ color: 'gray', marginTop: '20px' }}>BGM: フリーBGM・音楽素材MusMus https://musmus.main.jp</p>

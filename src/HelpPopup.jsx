@@ -7,7 +7,9 @@ function HelpPopup({ onClose, level: initialLevel, isDarkMode }) {
   const getHelpText = (level) => {
     switch (level) {
       case 'level1':
-        return `Level 1 のヒント：基本的な問題の解き方や考え方を説明します。`;
+        return `Level 1 のヒント：十の位の数が同じで、一の位の数の和が10になる2桁の数同士のかけ算は、
+      この方法で簡単に計算できます。
+            Multiplication between two-digit numbers with the same number of tens places and the sum of the numbers of ones places equals 10 can be easily calculated in this way.`;
       case 'level2':
         return `十の位の数が同じだけの時は以下のように考えられます。
 
