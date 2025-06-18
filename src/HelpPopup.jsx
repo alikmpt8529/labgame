@@ -7,9 +7,18 @@ function HelpPopup({ onClose, level: initialLevel, isDarkMode }) {
   const getHelpText = (level) => {
     switch (level) {
       case 'level1':
-        return `Level 1 のヒント：十の位の数が同じで、一の位の数の和が10になる2桁の数同士のかけ算は、
-      この方法で簡単に計算できます。
-            Multiplication between two-digit numbers with the same number of tens places and the sum of the numbers of ones places equals 10 can be easily calculated in this way.`;
+        return `十の位の数が同じで、一の位の数の和が10になる2桁の数同士のかけ算は、以下のように考えられます。
+      (Multiplication of two-digit numbers with the same number in the tens place and a sum of 10 in the ones place can be considered as follows.)
+      
+      (十の位の数) × (十の位の数 + 1) … 上位桁
+      (number of decimal places) × (number of decimal places + 1) ... Upper Digits
+
+      (一の位の数) × (もう一方の一の位の数) … 下位桁
+      (number of first places) × (number of the other first place) ... Lower Digit
+
+      図で構造を整理しよう！
+      Let's organize the structure with diagrams!`;
+
       case 'level2':
         return `十の位の数が同じだけの時は以下のように考えられます。
 
@@ -76,32 +85,32 @@ Let's organize the structure with diagrams!`;
     canvas.width = 400;
     canvas.height = 300;
     const ctx = canvas.getContext('2d');
-    
+
     // 背景
     ctx.fillStyle = isDarkMode ? '#2a2a2a' : '#f0f0f0';
     ctx.fillRect(0, 0, 400, 300);
-    
+
     // テキスト
     ctx.fillStyle = isDarkMode ? '#ffffff' : '#333333';
     ctx.font = '20px Arial';
     ctx.textAlign = 'center';
     ctx.fillText(`${level} ヒント画像 ${index + 1}`, 200, 140);
     ctx.fillText('(画像を準備中)', 200, 170);
-    
+
     return canvas.toDataURL();
   };
 
   return (
     <div style={{
-      position: 'fixed', 
-      top: '50%', 
+      position: 'fixed',
+      top: '50%',
       left: '50%',
-      transform: 'translate(-50%, -50%)', 
+      transform: 'translate(-50%, -50%)',
       backgroundColor: isDarkMode ? '#3c3c3c' : 'white',
       color: isDarkMode ? '#ffffff' : '#333333',
       padding: '30px',
       borderRadius: '10px',
-      boxShadow: '0 0 10px rgba(0, 0, 0, 0.3)', 
+      boxShadow: '0 0 10px rgba(0, 0, 0, 0.3)',
       zIndex: 1000,
       maxWidth: '95%',
       minWidth: '600px',
@@ -111,20 +120,20 @@ Let's organize the structure with diagrams!`;
       overflowY: 'auto',
       border: isDarkMode ? '1px solid #555555' : '1px solid #ddd'
     }}>
-      <h2 style={{ 
-        color: isDarkMode ? '#ffffff' : '#000000', 
-        borderBottom: isDarkMode ? '1px solid #555555' : '1px solid #ddd', 
+      <h2 style={{
+        color: isDarkMode ? '#ffffff' : '#000000',
+        borderBottom: isDarkMode ? '1px solid #555555' : '1px solid #ddd',
         paddingBottom: '10px',
         marginTop: 0,
         marginBottom: '20px'
       }}>
         ヒント(Hint)(タイマー停止中(Timer stopped)):
       </h2>
-      
+
       {/* レベル選択ボタン */}
       <div style={{ marginBottom: '20px' }}>
-        <span style={{ 
-          marginRight: '10px', 
+        <span style={{
+          marginRight: '10px',
           fontWeight: 'bold',
           color: isDarkMode ? '#ffffff' : '#000000'
         }}>
@@ -137,11 +146,11 @@ Let's organize the structure with diagrams!`;
             style={{
               margin: '0 5px',
               padding: '8px 16px',
-              backgroundColor: selectedLevel === lvl 
-                ? '#2196f3' 
+              backgroundColor: selectedLevel === lvl
+                ? '#2196f3'
                 : (isDarkMode ? '#555555' : '#e0e0e0'),
-              color: selectedLevel === lvl 
-                ? 'white' 
+              color: selectedLevel === lvl
+                ? 'white'
                 : (isDarkMode ? '#ffffff' : 'black'),
               border: 'none',
               borderRadius: '4px',
@@ -157,8 +166,8 @@ Let's organize the structure with diagrams!`;
       {/* 画像切り替えボタン */}
       {helpImages.length > 1 && (
         <div style={{ marginBottom: '15px', textAlign: 'center' }}>
-          <span style={{ 
-            marginRight: '10px', 
+          <span style={{
+            marginRight: '10px',
             fontWeight: 'bold',
             color: isDarkMode ? '#ffffff' : '#000000'
           }}>
@@ -171,11 +180,11 @@ Let's organize the structure with diagrams!`;
               style={{
                 margin: '0 5px',
                 padding: '6px 12px',
-                backgroundColor: imageIndex === index 
-                  ? '#ff9800' 
+                backgroundColor: imageIndex === index
+                  ? '#ff9800'
                   : (isDarkMode ? '#555555' : '#e0e0e0'),
-                color: imageIndex === index 
-                  ? 'white' 
+                color: imageIndex === index
+                  ? 'white'
                   : (isDarkMode ? '#ffffff' : 'black'),
                 border: 'none',
                 borderRadius: '4px',
@@ -190,8 +199,8 @@ Let's organize the structure with diagrams!`;
       )}
 
       {/* テキスト内容を改行対応で表示 */}
-      <div style={{ 
-        fontSize: '16px', 
+      <div style={{
+        fontSize: '16px',
         lineHeight: '1.8',
         marginBottom: '20px',
         color: isDarkMode ? '#ffffff' : '#333333',
@@ -206,8 +215,8 @@ Let's organize the structure with diagrams!`;
       </div>
 
       {/* 画像表示部分 */}
-      <div style={{ 
-        textAlign: 'center', 
+      <div style={{
+        textAlign: 'center',
         marginBottom: '20px',
         padding: '15px',
         backgroundColor: isDarkMode ? '#2a2a2a' : '#f9f9f9',
@@ -215,8 +224,8 @@ Let's organize the structure with diagrams!`;
         border: isDarkMode ? '1px solid #555555' : '1px solid #e0e0e0',
         minHeight: '300px'
       }}>
-        <img 
-          src={currentImage || createPlaceholderImage(selectedLevel, imageIndex)} 
+        <img
+          src={currentImage || createPlaceholderImage(selectedLevel, imageIndex)}
           alt={`${selectedLevel}のヒント画像 ${imageIndex + 1}`}
           style={{
             maxWidth: '100%',
@@ -234,7 +243,7 @@ Let's organize the structure with diagrams!`;
             console.log(`画像読み込み成功: ${currentImage}`);
           }}
         />
-        
+
         {/* ファイル配置の説明 */}
         <div style={{
           marginTop: '10px',
@@ -242,19 +251,19 @@ Let's organize the structure with diagrams!`;
           color: isDarkMode ? '#888888' : '#666666',
           textAlign: 'left'
         }}>
-          
+
         </div>
       </div>
 
-      <button 
-        onClick={onClose} 
+      <button
+        onClick={onClose}
         style={{
-          backgroundColor: '#4caf50', 
-          color: 'white', 
+          backgroundColor: '#4caf50',
+          color: 'white',
           border: 'none',
           padding: '12px 20px',
-          borderRadius: '4px', 
-          cursor: 'pointer', 
+          borderRadius: '4px',
+          cursor: 'pointer',
           fontSize: '16px',
           marginTop: '10px'
         }}
