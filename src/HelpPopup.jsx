@@ -8,9 +8,24 @@ function HelpPopup({ onClose, level: initialLevel, isDarkMode }) {
       case 'level1':
         return `Level 1 のヒント：基本的な問題の解き方や考え方を説明します。`;
       case 'level2':
-        return `Level 2 のヒント：`;
+        return `十の位の数が同じだけの時は以下のように考えられます。
+
+(When the number of decimal places is the same, it is considered as follows.)
+
+{(一方の数)+(他方の数の一の位)}×(十の位の数×10)+(一の位の数の積)
+
+{(one number) + (first place of the other number)} x (number of tenth places x 10) + (product of the number of first places)
+
+図で構造を整理しよう！
+Let's organize the structure with diagrams!`;
       case 'level3':
-        return `Level 3 のヒント：より高度な問題に関するヒントや解法を説明します。`;
+        return `十の位の数の和が10で、１の位の数が同じ場合は以下のように考えられます。
+      (When the sum of the numbers in the tens place is 10 and the numbers in the ones place are the same, it is considered as follows.)
+      {(一方の10の位の数)×(他方の10の位の数)}＋(共通の1のくらいの数)×100+(一の位の数の積)
+      {(one number in the tens place) x (the other number in the tens place)} + (common number in the ones place) x 100 + (product of the number in the ones place)
+      図で構造を整理しよう！
+      Let's organize the structure with diagrams!`
+      ;
       default:
         return 'ヘルプ情報が見つかりません。';
     }
@@ -19,11 +34,11 @@ function HelpPopup({ onClose, level: initialLevel, isDarkMode }) {
   const getHelpImage = (level) => {
     switch (level) {
       case 'level1':
-        return '/images/step0.png'; // Level1には画像なし
+        return '/images/step0.png'; // 先頭の./を/に変更
       case 'level2':
-        return '/images/step5.png'; // publicフォルダ内のstep5.pngを参照
+        return '/images/step5.png'; // 先頭の./を/に変更
       case 'level3':
-        return null; // Level3には画像なし（必要に応じて追加）
+        return '/images/l3tips.png'; // 先頭の./を/に変更
       default:
         return null;
     }
@@ -94,14 +109,21 @@ function HelpPopup({ onClose, level: initialLevel, isDarkMode }) {
         ))}
       </div>
 
-      <p style={{ 
+      {/* テキスト内容を改行対応で表示 */}
+      <div style={{ 
         fontSize: '16px', 
-        lineHeight: '1.6', // 行間を広げる
-        marginBottom: '20px', // マージンを増やす
-        color: isDarkMode ? '#ffffff' : '#333333'
+        lineHeight: '1.8', // 行間をさらに広げる
+        marginBottom: '20px',
+        color: isDarkMode ? '#ffffff' : '#333333',
+        whiteSpace: 'pre-wrap', // pre-lineからpre-wrapに変更
+        fontFamily: '"Courier New", monospace, sans-serif', // より見やすいフォント
+        backgroundColor: isDarkMode ? '#2a2a2a' : '#f8f8f8', // 背景色を追加
+        padding: '15px', // パディングを追加
+        borderRadius: '8px', // 角を丸くする
+        border: isDarkMode ? '1px solid #555555' : '1px solid #e0e0e0'
       }}>
         {helpTextContent}
-      </p>
+      </div>
 
       {/* 画像表示部分 */}
       {helpImageSrc && (
@@ -126,7 +148,18 @@ function HelpPopup({ onClose, level: initialLevel, isDarkMode }) {
             }}
             onError={(e) => {
               // 画像読み込みエラー時の処理
-              e.target.style.display = 'none';
+              e.target.parentNode.innerHTML = `
+                <div style="
+                  padding: 20px; 
+                  color: ${isDarkMode ? '#ff6b6b' : '#d32f2f'}; 
+                  text-align: center;
+                  border: 2px dashed ${isDarkMode ? '#555555' : '#cccccc'};
+                  border-radius: 8px;
+                ">
+                  画像を読み込めませんでした<br/>
+                  Image failed to load: ${helpImageSrc}
+                </div>
+              `;
               console.error(`画像の読み込みに失敗しました: ${helpImageSrc}`);
             }}
           />
