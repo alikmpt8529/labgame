@@ -116,7 +116,7 @@ Let's organize the structure with diagrams!`;
         marginTop: 0,
         marginBottom: '20px'
       }}>
-        ヒント(Hint)
+        ヒント(Hint)(タイマー停止中(Timer stopped)):
       </h2>
       
       {/* レベル選択ボタン */}
