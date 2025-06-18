@@ -55,15 +55,16 @@ Let's organize the structure with diagrams!`;
       transform: 'translate(-50%, -50%)', 
       backgroundColor: isDarkMode ? '#3c3c3c' : 'white',
       color: isDarkMode ? '#ffffff' : '#333333',
-      padding: '30px', // パディングを増やす
+      padding: '30px',
       borderRadius: '10px',
       boxShadow: '0 0 10px rgba(0, 0, 0, 0.3)', 
       zIndex: 1000,
-      maxWidth: '85%', // 最大幅を少し広げる
-      minWidth: '400px', // 最小幅を広げる
-      maxHeight: '90vh', // 最大高さを90vhに拡大
-      minHeight: '500px', // 最小高さを設定
-      overflowY: 'auto', // スクロール対応
+      maxWidth: '95%', // 85%から95%に拡大
+      minWidth: '600px', // 400pxから600pxに拡大
+      width: '80vw', // ビューポート幅の80%に設定
+      maxHeight: '90vh',
+      minHeight: '500px',
+      overflowY: 'auto',
       border: isDarkMode ? '1px solid #555555' : '1px solid #ddd'
     }}>
       <h2 style={{ 
