@@ -240,15 +240,7 @@ Let's organize the structure with diagrams!`;
           color: isDarkMode ? '#888888' : '#666666',
           textAlign: 'left'
         }}>
-          <strong>画像ファイルの配置場所:</strong>
-          <br />
-          以下のファイルを public フォルダに配置してください：
-          <ul style={{ margin: '5px 0', paddingLeft: '20px' }}>
-            <li>step0.png, step0_2.png (Level 1用)</li>
-            <li>step5.png, step5_2.png (Level 2用)</li>
-            <li>l3tips.png, l3tips_2.png (Level 3用)</li>
-          </ul>
-          配置先: <code>/Users/user/Documents/labgame/public/</code>
+          
         </div>
       </div>
 
