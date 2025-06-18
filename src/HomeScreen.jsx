@@ -6,7 +6,7 @@ import ResultPageB from './ResultPageB';
 import ResultPageC from './ResultPageC';
 import ResultPageD from './ResultPageD';
 
-const audio = new Audio('/audio/MusMus-BGM-141.mp3');
+const audio = new Audio('/audio/MusMus-BGM-147.mp3');
 audio.loop = true;
 audio.volume = 0.5;
 let isAudioPlaying = false; // BGMが再生中かを管理する変数
@@ -64,6 +64,9 @@ function HomeScreen(props) {
     return (
       <div style={{ textAlign: 'center', marginTop: '100px' }}>
         <h1>インド式計算ゲーム</h1>
+        <h2>レベルを選択してください</h2>
+        <p>select level</p>
+        {/* レベル選択ボタン */}
         <button onClick={() => handleNavigate('level1')} style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>
           Level 1
         </button>
@@ -78,6 +81,7 @@ function HomeScreen(props) {
         ヒント: hキーでヘルプを表示
       </p>
         {showHelp && HelpPopup && <HelpPopup level="level1" onClose={() => setShowHelp(false)} />} {/* ホーム画面でもヘルプ表示可能に */}
+      <p style={{ color: 'gray', marginTop: '20px' }}>BGM: フリーBGM・音楽素材MusMus https://musmus.main.jp</p>
       </div>
     );
   }
