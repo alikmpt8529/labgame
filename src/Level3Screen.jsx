@@ -9,14 +9,6 @@ const QUESTION_TYPE_UNITS_SAME_TENS_SUM_10 = 'UNITS_SAME_TENS_SUM_10'; // 一の
 const TOTAL_QUESTIONS = 5; // 問題の総数
 
 // 時間を分:秒形式に変換する関数
-const formatTime = (seconds) => {
-  if (typeof seconds !== 'number' || isNaN(seconds)) {
-    return '0:00';
-  }
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = Math.floor(seconds % 60);
-  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-};
 
 function Level3Screen({ onGoBack, onGoForward }) {
   // ダークモード対応
@@ -69,7 +61,7 @@ function Level3Screen({ onGoBack, onGoForward }) {
     return () => clearTimeout(timer);
   }, []); // 初回のみ実行
 
-  // タイマー管理（ポップアップ表示中も進行）
+  // タイマー管理（ポップアップ表示中は停止）
   useEffect(() => {
     // 時間切れの場合の処理  
     if (timeRemaining <= 0) {
@@ -84,8 +76,8 @@ function Level3Screen({ onGoBack, onGoForward }) {
     if (timerIdRef.current) {
       clearInterval(timerIdRef.current);
     }
-    // ゲーム進行中は常にタイマーを開始（ポップアップ表示中も進行）
-    if (currentQuestionIndex < TOTAL_QUESTIONS) {
+    // ゲーム進行中かつヘルプ表示中でない場合のみタイマーを開始
+    if (currentQuestionIndex < TOTAL_QUESTIONS && !showHelp) {
       timerIdRef.current = setInterval(() => {
         setTimeRemaining(prevTime => {
           const newTime = prevTime - 0.1; // 0.1秒ずつ減らす
@@ -99,7 +91,7 @@ function Level3Screen({ onGoBack, onGoForward }) {
         clearInterval(timerIdRef.current);
       }
     };
-  }, [timeRemaining, onGoBack, currentQuestionIndex]); // showHelpを依存配列から削除
+  }, [timeRemaining, onGoBack, currentQuestionIndex, showHelp]); // showHelpを依存配列に追加
 
   // 問題シーケンスの初期化
   const initializeQuestionSequence = () => {
@@ -177,17 +169,23 @@ function Level3Screen({ onGoBack, onGoForward }) {
     initializeQuestionSequence();
   }, []);
 
-  // 問題インデックス変更時の処理
+  // 問題インデックス変更時の処理 (問題生成専用)
   useEffect(() => {
     if (questionSequence.length === 0) return;
 
     if (currentQuestionIndex < TOTAL_QUESTIONS) {
       // 次の問題を生成
       generateQuestion();
-    } else if (currentQuestionIndex >= TOTAL_QUESTIONS) {
+    }
+  }, [questionSequence, currentQuestionIndex]); // 依存配列から timeSpent, onGoForward を削除
+
+  // 全問終了時の処理専用
+  useEffect(() => {
+    if (currentQuestionIndex >= TOTAL_QUESTIONS) {
       // 全問終了時の処理
       if (timerIdRef.current) {
         clearInterval(timerIdRef.current);
+        timerIdRef.current = null; // クリアしたことを明示
       }
       alert('クリア時間' + Math.round(timeSpent) + '秒\nRANK A : ~40秒\nRANK B : ~80秒\nRANK C : ~120秒\nRANK D : 121秒~');
       if (Math.round(timeSpent) < 41) onGoForward('result');
@@ -195,7 +193,7 @@ function Level3Screen({ onGoBack, onGoForward }) {
       else if (Math.round(timeSpent) < 121) onGoForward('resultC');
       else onGoForward('resultD');
     }
-  }, [questionSequence, currentQuestionIndex, timeSpent, onGoForward]);
+  }, [currentQuestionIndex, timeSpent, onGoForward]); // questionSequence はこのロジックに直接関係ないので削除
 
   // 入力値の変更処理（数字のみ許可）
   const handleInputChange = (e) => {
@@ -234,7 +232,7 @@ function Level3Screen({ onGoBack, onGoForward }) {
       // 1秒後に次の問題へ進む
       setTimeout(() => {
         setCurrentQuestionIndex(nextQuestionIndex);
-      }, 1000);
+      }, 1500); // 遅延時間を1000ミリ秒 (1秒) から1500ミリ秒 (1.5秒) に変更
     } else {
       // 不正解の場合
       setResult('×　不正解');
@@ -276,7 +274,7 @@ function Level3Screen({ onGoBack, onGoForward }) {
             fontSize: '20px',
             fontWeight: 'bold',
             zIndex: 100,
-            color: isDarkMode ? '#ffffff' : '#000000',
+            color: showHelp ? '#ff6b6b' : (isDarkMode ? '#ffffff' : '#000000'), // ポップアップ表示中は赤色
             padding: '8px 15px',
             borderRadius: '8px',
             margin: 0,
