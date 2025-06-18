@@ -40,7 +40,7 @@ const VedicTutorial = ({ onGoBack }) => {
     },
     3: {
       question: 'Step 3: 27 × 23 = ?',
-      explanation: `Step 1の「6」とStep 2の「21」をつなげて最終的な積を求めてみよう！\n(Let\'s connect “6” in Step 1 and “21” in Step 2 to find the final product!)`,
+      explanation: `Step 1の「6」とStep 2の「21」をつなげて最終的な積を求めてみよう！\n(Let\'s connect "6" in Step 1 and "21" in Step 2 to find the final product!)`,
       image: '/images/step3.png',
       inputRequired: true,
     },
@@ -124,7 +124,7 @@ const VedicTutorial = ({ onGoBack }) => {
     setPreviousStep(step);
     
     if (step === 5 || step === 6) {
-      setStep(4);
+      setStep(0);
     } else if (step === 8) {
       setStep(7);
     }
@@ -202,6 +202,24 @@ const VedicTutorial = ({ onGoBack }) => {
             {step > 0 && <button onClick={handleBack} style={{ padding: '8px 16px' }}>← 前へ/Previous</button>}
             {step === 0 && <button onClick={handleNextStep0} style={{ padding: '8px 16px', marginLeft: '10px' }}>次へ/Next →</button>}
           </div>
+          {previousStep && (previousStep === 5 || previousStep === 6) && (
+            <div style={{ marginTop: '20px' }}>
+              <button 
+                onClick={handleReturnToPractice}
+                style={{
+                  padding: '10px 20px',
+                  fontSize: '16px',
+                  backgroundColor: '#4caf50',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '5px',
+                  cursor: 'pointer'
+                }}
+              >
+                練習問題に戻る (Exercise {previousStep - 4}) / Return to Practice
+              </button>
+            </div>
+          )}
         </>
       )}
       {(step>0 && step <= 3) && (
@@ -252,24 +270,7 @@ const VedicTutorial = ({ onGoBack }) => {
           </button>
           
           {/* 練習問題に戻るボタンを追加 */}
-          {previousStep && (previousStep === 5 || previousStep === 6) && (
-            <div style={{ marginTop: '20px' }}>
-              <button 
-                onClick={handleReturnToPractice}
-                style={{
-                  padding: '10px 20px',
-                  fontSize: '16px',
-                  backgroundColor: '#4caf50',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '5px',
-                  cursor: 'pointer'
-                }}
-              >
-                練習問題に戻る (Exercise {previousStep - 4}) / Return to Practice
-              </button>
-            </div>
-          )}
+          
         </>
       )}
 
