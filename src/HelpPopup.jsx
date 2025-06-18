@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 function HelpPopup({ onClose, level: initialLevel, isDarkMode }) {
   const [selectedLevel, setSelectedLevel] = useState(initialLevel || 'level1');
+  const [imageIndex, setImageIndex] = useState(0); // 画像切り替え用のstate
 
   const getHelpText = (level) => {
     switch (level) {
@@ -24,28 +25,69 @@ Let's organize the structure with diagrams!`;
       {(一方の10の位の数)×(他方の10の位の数)}＋(共通の1のくらいの数)×100+(一の位の数の積)
       {(one number in the tens place) x (the other number in the tens place)} + (common number in the ones place) x 100 + (product of the number in the ones place)
       図で構造を整理しよう！
-      Let's organize the structure with diagrams!`
-      ;
+      Let's organize the structure with diagrams!`;
       default:
         return 'ヘルプ情報が見つかりません。';
     }
   };
 
-  const getHelpImage = (level) => {
-    switch (level) {
-      case 'level1':
-        return '/images/step0.png'; // 先頭の./を/に変更
-      case 'level2':
-        return '/images/step5.png'; // 先頭の./を/に変更
-      case 'level3':
-        return '/images/l3tips.png'; // 先頭の./を/に変更
-      default:
-        return null;
+  // 各レベルで2つの画像を用意
+  const getHelpImages = (level) => {
+    try {
+      switch (level) {
+        case 'level1':
+          return [
+            '/images/step0.png',
+            '/images/step4.png' // 2つ目の画像
+          ];
+        case 'level2':
+          return [
+            '/images/step5.png',
+            '/images/level2-hint2.png' // 2つ目の画像
+          ];
+        case 'level3':
+          return [
+            '/images/l3tips.png',
+            '/images/level3-hint2.png' // 2つ目の画像
+          ];
+        default:
+          return [];
+      }
+    } catch (error) {
+      console.error('画像パス生成エラー:', error);
+      return [];
     }
   };
 
   const helpTextContent = getHelpText(selectedLevel);
-  const helpImageSrc = getHelpImage(selectedLevel);
+  const helpImages = getHelpImages(selectedLevel);
+  const currentImage = helpImages[imageIndex];
+
+  // レベル切り替え時に画像インデックスをリセット
+  React.useEffect(() => {
+    setImageIndex(0);
+  }, [selectedLevel]);
+
+  // 画像が存在しない場合のフォールバック用プレースホルダー画像を作成
+  const createPlaceholderImage = (level, index) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 400;
+    canvas.height = 300;
+    const ctx = canvas.getContext('2d');
+    
+    // 背景
+    ctx.fillStyle = isDarkMode ? '#2a2a2a' : '#f0f0f0';
+    ctx.fillRect(0, 0, 400, 300);
+    
+    // テキスト
+    ctx.fillStyle = isDarkMode ? '#ffffff' : '#333333';
+    ctx.font = '20px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(`${level} ヒント画像 ${index + 1}`, 200, 140);
+    ctx.fillText('(画像を準備中)', 200, 170);
+    
+    return canvas.toDataURL();
+  };
 
   return (
     <div style={{
@@ -59,9 +101,9 @@ Let's organize the structure with diagrams!`;
       borderRadius: '10px',
       boxShadow: '0 0 10px rgba(0, 0, 0, 0.3)', 
       zIndex: 1000,
-      maxWidth: '95%', // 85%から95%に拡大
-      minWidth: '600px', // 400pxから600pxに拡大
-      width: '80vw', // ビューポート幅の80%に設定
+      maxWidth: '95%',
+      minWidth: '600px',
+      width: '80vw',
       maxHeight: '90vh',
       minHeight: '500px',
       overflowY: 'auto',
@@ -70,15 +112,15 @@ Let's organize the structure with diagrams!`;
       <h2 style={{ 
         color: isDarkMode ? '#ffffff' : '#000000', 
         borderBottom: isDarkMode ? '1px solid #555555' : '1px solid #ddd', 
-        paddingBottom: '10px', // パディングを増やす
+        paddingBottom: '10px',
         marginTop: 0,
-        marginBottom: '20px' // マージンを増やす
+        marginBottom: '20px'
       }}>
         ヒント(Hint)
       </h2>
       
       {/* レベル選択ボタン */}
-      <div style={{ marginBottom: '20px' }}> {/* マージンを増やす */}
+      <div style={{ marginBottom: '20px' }}>
         <span style={{ 
           marginRight: '10px', 
           fontWeight: 'bold',
@@ -92,7 +134,7 @@ Let's organize the structure with diagrams!`;
             onClick={() => setSelectedLevel(lvl)}
             style={{
               margin: '0 5px',
-              padding: '8px 16px', // パディングを増やす
+              padding: '8px 16px',
               backgroundColor: selectedLevel === lvl 
                 ? '#2196f3' 
                 : (isDarkMode ? '#555555' : '#e0e0e0'),
@@ -110,62 +152,105 @@ Let's organize the structure with diagrams!`;
         ))}
       </div>
 
+      {/* 画像切り替えボタン */}
+      {helpImages.length > 1 && (
+        <div style={{ marginBottom: '15px', textAlign: 'center' }}>
+          <span style={{ 
+            marginRight: '10px', 
+            fontWeight: 'bold',
+            color: isDarkMode ? '#ffffff' : '#000000'
+          }}>
+            画像切り替え(Switch Image):
+          </span>
+          {helpImages.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setImageIndex(index)}
+              style={{
+                margin: '0 5px',
+                padding: '6px 12px',
+                backgroundColor: imageIndex === index 
+                  ? '#ff9800' 
+                  : (isDarkMode ? '#555555' : '#e0e0e0'),
+                color: imageIndex === index 
+                  ? 'white' 
+                  : (isDarkMode ? '#ffffff' : 'black'),
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '12px'
+              }}
+            >
+              画像 {index + 1}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* テキスト内容を改行対応で表示 */}
       <div style={{ 
         fontSize: '16px', 
-        lineHeight: '1.8', // 行間をさらに広げる
+        lineHeight: '1.8',
         marginBottom: '20px',
         color: isDarkMode ? '#ffffff' : '#333333',
-        whiteSpace: 'pre-wrap', // pre-lineからpre-wrapに変更
-        fontFamily: '"Courier New", monospace, sans-serif', // より見やすいフォント
-        backgroundColor: isDarkMode ? '#2a2a2a' : '#f8f8f8', // 背景色を追加
-        padding: '15px', // パディングを追加
-        borderRadius: '8px', // 角を丸くする
+        whiteSpace: 'pre-wrap',
+        fontFamily: '"Courier New", monospace, sans-serif',
+        backgroundColor: isDarkMode ? '#2a2a2a' : '#f8f8f8',
+        padding: '15px',
+        borderRadius: '8px',
         border: isDarkMode ? '1px solid #555555' : '1px solid #e0e0e0'
       }}>
         {helpTextContent}
       </div>
 
       {/* 画像表示部分 */}
-      {helpImageSrc && (
-        <div style={{ 
-          textAlign: 'center', 
-          marginBottom: '20px', // マージンを増やす
-          padding: '15px', // パディングを増やす
-          backgroundColor: isDarkMode ? '#2a2a2a' : '#f9f9f9',
-          borderRadius: '8px',
-          border: isDarkMode ? '1px solid #555555' : '1px solid #e0e0e0',
-          minHeight: '300px' // 画像エリアの最小高さを設定
+      <div style={{ 
+        textAlign: 'center', 
+        marginBottom: '20px',
+        padding: '15px',
+        backgroundColor: isDarkMode ? '#2a2a2a' : '#f9f9f9',
+        borderRadius: '8px',
+        border: isDarkMode ? '1px solid #555555' : '1px solid #e0e0e0',
+        minHeight: '300px'
+      }}>
+        <img 
+          src={currentImage || createPlaceholderImage(selectedLevel, imageIndex)} 
+          alt={`${selectedLevel}のヒント画像 ${imageIndex + 1}`}
+          style={{
+            maxWidth: '100%',
+            maxHeight: '400px',
+            height: 'auto',
+            borderRadius: '4px',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+          }}
+          onError={(e) => {
+            // 画像読み込みエラー時にプレースホルダーを表示
+            console.log('画像読み込み失敗、プレースホルダーを表示');
+            e.target.src = createPlaceholderImage(selectedLevel, imageIndex);
+          }}
+          onLoad={() => {
+            console.log(`画像読み込み成功: ${currentImage}`);
+          }}
+        />
+        
+        {/* ファイル配置の説明 */}
+        <div style={{
+          marginTop: '10px',
+          fontSize: '12px',
+          color: isDarkMode ? '#888888' : '#666666',
+          textAlign: 'left'
         }}>
-          <img 
-            src={helpImageSrc} 
-            alt={`${selectedLevel}のヒント画像`}
-            style={{
-              maxWidth: '100%',
-              maxHeight: '400px', // 画像の最大高さを設定
-              height: 'auto',
-              borderRadius: '4px',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
-            }}
-            onError={(e) => {
-              // 画像読み込みエラー時の処理
-              e.target.parentNode.innerHTML = `
-                <div style="
-                  padding: 20px; 
-                  color: ${isDarkMode ? '#ff6b6b' : '#d32f2f'}; 
-                  text-align: center;
-                  border: 2px dashed ${isDarkMode ? '#555555' : '#cccccc'};
-                  border-radius: 8px;
-                ">
-                  画像を読み込めませんでした<br/>
-                  Image failed to load: ${helpImageSrc}
-                </div>
-              `;
-              console.error(`画像の読み込みに失敗しました: ${helpImageSrc}`);
-            }}
-          />
+          <strong>画像ファイルの配置場所:</strong>
+          <br />
+          以下のファイルを public フォルダに配置してください：
+          <ul style={{ margin: '5px 0', paddingLeft: '20px' }}>
+            <li>step0.png, step0_2.png (Level 1用)</li>
+            <li>step5.png, step5_2.png (Level 2用)</li>
+            <li>l3tips.png, l3tips_2.png (Level 3用)</li>
+          </ul>
+          配置先: <code>/Users/user/Documents/labgame/public/</code>
         </div>
-      )}
+      </div>
 
       <button 
         onClick={onClose} 
@@ -173,14 +258,14 @@ Let's organize the structure with diagrams!`;
           backgroundColor: '#4caf50', 
           color: 'white', 
           border: 'none',
-          padding: '12px 20px', // パディングを増やす
+          padding: '12px 20px',
           borderRadius: '4px', 
           cursor: 'pointer', 
           fontSize: '16px',
-          marginTop: '10px' // 上マージンを追加
+          marginTop: '10px'
         }}
       >
-        問題へ戻る(Return to qustion)
+        問題へ戻る(Return to question)
       </button>
     </div>
   );
