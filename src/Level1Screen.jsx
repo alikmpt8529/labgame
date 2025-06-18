@@ -6,6 +6,8 @@ const VedicTutorial = ({ onGoBack }) => {
   const [message, setMessage] = useState('');
   const [isStepCleared, setIsStepCleared] = useState(false);
   const [practiceProblem, setPracticeProblem] = useState({ num1: 0, num2: 0, answer: 0 });
+  // 前のstepを記憶するstate
+  const [previousStep, setPreviousStep] = useState(null);
 
   const correctAnswers = {
     1: 6,
@@ -117,6 +119,27 @@ const VedicTutorial = ({ onGoBack }) => {
     }
   };
 
+  const handleBackSummary = () => {
+    // 現在のstepを記憶
+    setPreviousStep(step);
+    
+    if (step === 5 || step === 6) {
+      setStep(4);
+    } else if (step === 8) {
+      setStep(7);
+    }
+    setInput('');
+    setMessage('');
+    setIsStepCleared(false);
+  };
+
+  // 練習問題に戻る関数
+  const handleReturnToPractice = () => {
+    if (previousStep !== null) {
+      setStep(previousStep);
+      setPreviousStep(null); // リセット
+    }
+  };
 
   const handlePracticeSubmit = () => {
     const userAnswer = parseInt(input, 10);
@@ -227,6 +250,26 @@ const VedicTutorial = ({ onGoBack }) => {
           >
             練習問題へチャレンジ(Try the Exercises) →
           </button>
+          
+          {/* 練習問題に戻るボタンを追加 */}
+          {previousStep && (previousStep === 5 || previousStep === 6) && (
+            <div style={{ marginTop: '20px' }}>
+              <button 
+                onClick={handleReturnToPractice}
+                style={{
+                  padding: '10px 20px',
+                  fontSize: '16px',
+                  backgroundColor: '#4caf50',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '5px',
+                  cursor: 'pointer'
+                }}
+              >
+                練習問題に戻る (Exercise {previousStep - 4}) / Return to Practice
+              </button>
+            </div>
+          )}
         </>
       )}
 
@@ -239,6 +282,10 @@ const VedicTutorial = ({ onGoBack }) => {
           onKeyDown={(e) => e.key === 'Enter' && handlePracticeSubmit()} disabled={isStepCleared} style={{ padding: '10px', fontSize: '18px', width: '180px', marginBottom: '10px' }}/>
           <br />
           <button onClick={handlePracticeSubmit}>答え合わせ/Check answers</button>
+          <button onClick={handleBackSummary} style={{ marginLeft: '10px', padding: '10px 20px' }}>
+            まとめに戻る|Back to Summary
+          </button>
+          {/* まとめに戻るボタンを追加 */}
           {message && <p style={{ whiteSpace: 'pre-line'}}>{message}</p>}
         </>
       )}
@@ -251,6 +298,9 @@ const VedicTutorial = ({ onGoBack }) => {
           onKeyDown={(e) => e.key === 'Enter' && handlePracticeSubmit()} disabled={isStepCleared} style={{ padding: '10px', fontSize: '18px', width: '180px', marginBottom: '10px' }}/>
           <br />
           <button onClick={handlePracticeSubmit}>答え合わせ/Check answers</button>
+          <button onClick={handleBackSummary} style={{ marginLeft: '10px', padding: '10px 20px' }}>
+            まとめに戻る|Back to Summary
+          </button>
           {message && <p style={{ whiteSpace: 'pre-line'}}>{message}</p>}
         </>
       )}
@@ -280,6 +330,26 @@ const VedicTutorial = ({ onGoBack }) => {
             {step > 0 && <button onClick={handleBack} style={{ padding: '8px 16px' }}>← 前へ/Previous</button>}
             {step === 0 && <button onClick={handleNextStep0} style={{ padding: '8px 16px', marginLeft: '10px' }}>次へ/Next →</button>}
           </div>
+          
+          {/* 練習問題に戻るボタンを追加 */}
+          {previousStep && previousStep === 8 && (
+            <div style={{ marginTop: '20px' }}>
+              <button 
+                onClick={handleReturnToPractice}
+                style={{
+                  padding: '10px 20px',
+                  fontSize: '16px',
+                  backgroundColor: '#4caf50',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '5px',
+                  cursor: 'pointer'
+                }}
+              >
+                練習問題に戻る (Exercise ③) / Return to Practice
+              </button>
+            </div>
+          )}
         </>
       )}
       {step === 8 && (/*Same10の問題 */
@@ -291,6 +361,9 @@ const VedicTutorial = ({ onGoBack }) => {
           <br />
           <button onClick={handlePracticeSubmit}>答え合わせ/Check answers</button>
           {message && <p style={{ whiteSpace: 'pre-line'}}>{message}</p>}
+          <button onClick={handleBackSummary} style={{ marginLeft: '10px', padding: '10px 20px' }}>
+            まとめに戻る|Back to Summary
+          </button>
         </>
       )}
       {step === 9 && (

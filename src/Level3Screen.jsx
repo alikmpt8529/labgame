@@ -8,7 +8,22 @@ const QUESTION_TYPE_UNITS_SAME_TENS_SUM_10 = 'UNITS_SAME_TENS_SUM_10'; // 一の
 
 const TOTAL_QUESTIONS = 5; // 問題の総数
 
+// 時間を分:秒形式に変換する関数
+
 function Level3Screen({ onGoBack, onGoForward }) {
+  // ダークモード対応
+  const [isDarkMode, setIsDarkMode] = useState(
+    window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+  );
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e) => setIsDarkMode(e.matches);
+
+    mediaQuery.addListener(handleChange);
+    return () => mediaQuery.removeListener(handleChange);
+  }, []);
+
   // ステート管理
   const [inputValue, setInputValue] = useState(''); // ユーザーの入力値
   const [numA, setNumA] = useState(null); // 問題の第一の数値
@@ -46,7 +61,7 @@ function Level3Screen({ onGoBack, onGoForward }) {
     return () => clearTimeout(timer);
   }, []); // 初回のみ実行
 
-  // タイマー管理（ポップアップ表示中も進行）
+  // タイマー管理（ポップアップ表示中は停止）
   useEffect(() => {
     // 時間切れの場合の処理  
     if (timeRemaining <= 0) {
@@ -61,8 +76,8 @@ function Level3Screen({ onGoBack, onGoForward }) {
     if (timerIdRef.current) {
       clearInterval(timerIdRef.current);
     }
-    // ゲーム進行中は常にタイマーを開始（ポップアップ表示中も進行）
-    if (currentQuestionIndex < TOTAL_QUESTIONS) {
+    // ゲーム進行中かつヘルプ表示中でない場合のみタイマーを開始
+    if (currentQuestionIndex < TOTAL_QUESTIONS && !showHelp) {
       timerIdRef.current = setInterval(() => {
         setTimeRemaining(prevTime => {
           const newTime = prevTime - 0.1; // 0.1秒ずつ減らす
@@ -76,7 +91,7 @@ function Level3Screen({ onGoBack, onGoForward }) {
         clearInterval(timerIdRef.current);
       }
     };
-  }, [timeRemaining, onGoBack, currentQuestionIndex]); // showHelpを依存配列から削除
+  }, [timeRemaining, onGoBack, currentQuestionIndex, showHelp]); // showHelpを依存配列に追加
 
   // 問題シーケンスの初期化
   const initializeQuestionSequence = () => {
@@ -154,17 +169,23 @@ function Level3Screen({ onGoBack, onGoForward }) {
     initializeQuestionSequence();
   }, []);
 
-  // 問題インデックス変更時の処理
+  // 問題インデックス変更時の処理 (問題生成専用)
   useEffect(() => {
     if (questionSequence.length === 0) return;
 
     if (currentQuestionIndex < TOTAL_QUESTIONS) {
       // 次の問題を生成
       generateQuestion();
-    } else if (currentQuestionIndex >= TOTAL_QUESTIONS) {
+    }
+  }, [questionSequence, currentQuestionIndex]); // 依存配列から timeSpent, onGoForward を削除
+
+  // 全問終了時の処理専用
+  useEffect(() => {
+    if (currentQuestionIndex >= TOTAL_QUESTIONS) {
       // 全問終了時の処理
       if (timerIdRef.current) {
         clearInterval(timerIdRef.current);
+        timerIdRef.current = null; // クリアしたことを明示
       }
       alert('クリア時間' + Math.round(timeSpent) + '秒\nRANK A : ~40秒\nRANK B : ~80秒\nRANK C : ~120秒\nRANK D : 121秒~');
       if (Math.round(timeSpent) < 41) onGoForward('result');
@@ -172,7 +193,7 @@ function Level3Screen({ onGoBack, onGoForward }) {
       else if (Math.round(timeSpent) < 121) onGoForward('resultC');
       else onGoForward('resultD');
     }
-  }, [questionSequence, currentQuestionIndex]);
+  }, [currentQuestionIndex, timeSpent, onGoForward]); // questionSequence はこのロジックに直接関係ないので削除
 
   // 入力値の変更処理（数字のみ許可）
   const handleInputChange = (e) => {
@@ -203,7 +224,7 @@ function Level3Screen({ onGoBack, onGoForward }) {
     
     if (parseInt(inputValue, 10) === correctAnswer) {
       // 正解の場合
-      setResult('正解！');
+      setResult('⚪︎　正解！');
       const nextQuestionIndex = currentQuestionIndex + 1;
       // 経過時間を更新
       setTimeSpent(timeSpent + (60 - timeRemaining));
@@ -211,105 +232,133 @@ function Level3Screen({ onGoBack, onGoForward }) {
       // 1秒後に次の問題へ進む
       setTimeout(() => {
         setCurrentQuestionIndex(nextQuestionIndex);
-      }, 1000);
+      }, 1500); // 遅延時間を1000ミリ秒 (1秒) から1500ミリ秒 (1.5秒) に変更
     } else {
       // 不正解の場合
-      setResult('不正解');
+      setResult('×　不正解');
     }
   };
 
-  // Level2と同じプログレスバースタイル
-  const progressBarContainerStyle = {
-    width: '100%',
-    height: '20px',
-    backgroundColor: '#e0e0e0',
-    borderRadius: '10px',
-    overflow: 'hidden', 
-    margin: '10px 0 20px 0' 
-  };
-
-  const progressBarStyle = {
-    height: '100%',
-    width: `${(timeRemaining / 60) * 100}%`,
-    backgroundColor: timeRemaining > 10 ? '#4caf50' : '#f44336', 
-    transition: 'width 0.1s linear' // Level3の滑らかな更新を維持
-  };
-
-  // メインUI表示（Level2と同じレイアウト）
+  // Level2と同じUIを使用
   return (
     <>
-      <div style={{ textAlign: 'center', marginTop: '50px' }}>
-        {/* ヘッダー */}
-        <h1>レベル3 - インド式計算チャレンジ</h1>
-        {/* メインコンテンツ */}
-        <div style={{ 
-          maxWidth: '600px', 
-          margin: '20px auto', 
-          padding: '20px', 
-          border: '1px solid #ccc', 
-          borderRadius: '8px', 
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)' 
+      <div className={`game-container ${showHelp ? 'popup-active' : ''}`} style={{ 
+        color: isDarkMode ? '#ffffff' : '#000000',
+        backgroundColor: isDarkMode ? '#2d2d30' : '#ffffff',
+        minHeight: '100vh',
+        transition: 'background-color 0.3s ease, color 0.3s ease'
+      }}>
+        <h1 className="game-title" style={{ 
+          color: isDarkMode ? '#ffffff' : '#000000',
+          transition: 'color 0.3s ease'
         }}>
-          {/* 問題表示 - Level2と同じスタイル */}
-          <p style={{ fontSize: '24px', fontWeight: 'bold', textAlign: 'center' }}>
-            問題: {numA} × {numB} = <input 
-                type="text" 
-                value={inputValue} 
-                onChange={(e) => setInputValue(e.target.value)} 
-                onKeyDown={(e) => { if (e.key === 'Enter') { checkAnswer(); } }} 
-                placeholder="答えを入力" 
-                style={{ padding: '10px', fontSize: '18px', width: '150px', borderRadius: '5px', border: '1px solid #ccc', marginRight: '10px' }} 
-              />
+          level3
+        </h1>
+        <div className="game-main-content" style={{ 
+          border: isDarkMode ? '1px solid #555555' : '1px solid #cccccc',
+          boxShadow: isDarkMode 
+            ? '0 2px 4px rgba(0,0,0,0.3)' 
+            : '0 2px 4px rgba(0,0,0,0.1)',
+          backgroundColor: isDarkMode ? '#3c3c3c' : '#ffffff',
+          color: isDarkMode ? '#ffffff' : '#000000',
+          position: 'relative',
+          paddingTop: '60px',
+          transition: 'all 0.3s ease'
+        }}>
+          {/* タイマー表示を中央上部に配置し、文字サイズを大きく */}
+          <h3 className={`level3-timer ${showHelp ? 'help-active' : ''}`} style={{
+            position: 'absolute',
+            top: '15px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            fontSize: '20px',
+            fontWeight: 'bold',
+            zIndex: 100,
+            color: showHelp ? '#ff6b6b' : (isDarkMode ? '#ffffff' : '#000000'), // ポップアップ表示中は赤色
+            padding: '8px 15px',
+            borderRadius: '8px',
+            margin: 0,
+            textAlign: 'center',
+            whiteSpace: 'nowrap',
+            transition: 'all 0.3s ease'
+          }}>
+            残り時間(remaining time): {Math.ceil(timeRemaining)} {showHelp && '(一時停止中)'}
+          </h3>
+
+          <p className={`game-question ${isDarkMode ? 'dark-theme' : 'light-theme'}`}>
+            問題(Question): {numA} × {numB} = 
+            <input 
+              type="text" 
+              value={inputValue} 
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              placeholder="答えを入力" 
+              disabled={showHelp}
+              autoFocus={!showHelp}
+              className={`game-input ${showHelp ? 'input-disabled' : ''} ${isDarkMode ? 'dark-theme' : 'light-theme'}`}
+            />
           </p>
-          <p style={{ textAlign: 'center' }}>問題 {currentQuestionIndex + 1} / {TOTAL_QUESTIONS}</p>
           
-          {/* タイマー表示 */}
-          <div>
-            <p style={{ 
-              textAlign: 'center', 
-              marginBottom: '5px',
-              color: showHelp ? '#ff6b6b' : '#000' // ポップアップ表示中は赤色で警告
-            }}>
-              残り時間: {Math.ceil(timeRemaining)} 秒 {showHelp && '(進行中)'}
-            </p>
-            {/* プログレスバー */}
-            <div style={progressBarContainerStyle}>
-              <div style={progressBarStyle}></div>
-            </div>
-          </div>
+          <p className={`game-counter ${isDarkMode ? 'dark-theme' : 'light-theme'}`}>
+            問題(now) {currentQuestionIndex + 1} / {TOTAL_QUESTIONS}
+          </p>
           
-          {/* 入力エリア - Level2と同じスタイル */}
-          <div style={{ marginTop: '20px', textAlign: 'center' }}>
-            <button onClick={checkAnswer} style={{ padding: '10px 15px', fontSize: '18px' }}>回答</button>
-            
-            {/* 結果表示 */}
+          <div className="game-input-section">
             {result && (
-              <p style={{ 
-                marginTop: '15px', 
-                fontSize: '20px', 
-                fontWeight: 'bold', 
-                color: result === '正解！' ? 'red' : 'blue' // 正解は赤色、不正解は青色
-              }}>{result}</p>
+              <p className="game-result" style={{ 
+                color: result === '正解！' 
+                  ? (isDarkMode ? '#ff6b6b' : '#d32f2f')
+                  : (isDarkMode ? '#4dabf7' : '#1976d2')
+              }}>
+                {result}
+              </p>
             )}
             
-            {/* ヘルプヒント */}
-            <p style={{ fontSize: '0.8em', color: 'gray', marginTop: '20px' }}>
-              ヒント: hキーでヘルプを表示 | Enterキーで回答
+            {/* プログレスバーを緑色に変更 */}
+            <div style={{
+              width: '100%',
+              height: '15px',
+              backgroundColor: isDarkMode ? '#555555' : '#e0e0e0',
+              borderRadius: '7px',
+              overflow: 'hidden',
+              marginBottom: '10px'
+            }}>
+              <div style={{
+                width: `${(timeRemaining / 60) * 100}%`,
+                height: '100%',
+                backgroundColor: isDarkMode ? '#4caf50' : '#4caf50', // 緑色に変更
+                transition: 'width 0.1s ease'
+              }}></div>
+            </div>
+            
+            <p className="game-hint" style={{ 
+              color: isDarkMode ? '#cccccc' : '#666666'
+            }}>
+              ヒント: hキーで表示(Hint: Press the h key to display.) | Enterキーで回答(Press the Enter key to answer.)
             </p>
           </div>
         </div>
-        {/* ホームに戻るボタン */}
+        
         <button 
           onClick={onGoBack} 
-          style={{ marginTop: '30px', padding: '10px 20px' }}
-        >リタイア</button>
+          className="game-retry-button"
+          style={{
+            backgroundColor: isDarkMode ? '#555555' : '#f0f0f0',
+            color: isDarkMode ? '#ffffff' : '#000000',
+            border: isDarkMode ? '1px solid #777777' : '1px solid #cccccc',
+            transition: 'all 0.3s ease'
+          }}
+        >
+          ホームに戻る(return to home)
+        </button>
       </div>
 
-      {/* ヘルプポップアップ */}
+      {/* HelpPopupを一つだけ表示 */}
       {showHelp && (
         <HelpPopup 
           level="level3" 
-          onClose={() => setShowHelp(false)} 
+          onClose={() => setShowHelp(false)}
+          isDarkMode={isDarkMode}
         />
       )}
     </>

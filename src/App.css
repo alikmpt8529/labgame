@@ -1,5 +1,5 @@
 #root {
-  max-width: 1280px;
+  max-width: 100%;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
@@ -39,4 +39,397 @@
 
 .read-the-docs {
   color: #888;
+}
+
+/* Level2 入力欄のスタイル */
+.level2-input {
+  border: 1px solid #ccc;
+  background-color: #ffffff;
+  color: #000000;
+}
+
+/* Level2 入力欄（無効時）のスタイル */
+.level2-input-disabled {
+  background-color: #f5f5f5;
+  color: #666666;
+}
+
+/* Level2 入力欄のプレースホルダー */
+.level2-input::placeholder {
+  color: #999999;
+  opacity: 1;
+}
+
+.level2-input::-webkit-input-placeholder {
+  color: #999999;
+}
+
+.level2-input::-moz-placeholder {
+  color: #999999;
+  opacity: 1;
+}
+
+.level2-input:-ms-input-placeholder {
+  color: #999999;
+}
+
+.level2-input:-moz-placeholder {
+  color: #999999;
+  opacity: 1;
+}
+
+/* Level2 入力欄のフォーカス時 */
+.level2-input:focus {
+  border-color: #007acc;
+  box-shadow: 0 0 5px rgba(0, 122, 204, 0.3);
+}
+
+/* ライトモード用のスタイル */
+@media (prefers-color-scheme: light) {
+  /* Level2とLevel3のテキスト要素（ライトモード） */
+  .level2-timer,
+  .level3-timer,
+  .level2-question,
+  .level3-question,
+  .level2-counter,
+  .level3-counter {
+    color: #000000 !important; /* 黒文字 */
+  }
+
+  /* ヘルプ表示中はライトモードでも赤色を維持 */
+  .level2-timer.help-active,
+  .level3-timer.help-active {
+    color: #d32f2f !important; /* 濃い赤 */
+  }
+
+  /* Level2とLevel3の入力欄（ライトモード） */
+  .level2-input,
+  .level3-input {
+    border: 1px solid #cccccc !important;
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* Level2とLevel3の入力欄（無効時・ライトモード） */
+  .level2-input-disabled,
+  .level3-input-disabled {
+    background-color: #f5f5f5 !important;
+    color: #666666 !important;
+  }
+
+  /* プレースホルダー（ライトモード） */
+  .level2-input::placeholder,
+  .level3-input::placeholder {
+    color: #999999 !important;
+  }
+
+  .level2-input::-webkit-input-placeholder,
+  .level3-input::-webkit-input-placeholder {
+    color: #999999 !important;
+  }
+
+  .level2-input::-moz-placeholder,
+  .level3-input::-moz-placeholder {
+    color: #999999 !important;
+  }
+
+  .level2-input:-ms-input-placeholder,
+  .level3-input:-ms-input-placeholder {
+    color: #999999 !important;
+  }
+
+  /* フォーカス時（ライトモード） */
+  .level2-input:focus,
+  .level3-input:focus {
+    border-color: #007acc !important;
+    box-shadow: 0 0 5px rgba(0, 122, 204, 0.3) !important;
+  }
+}
+
+/* ダークモード用のスタイル（明示的に指定） */
+@media (prefers-color-scheme: dark) {
+  .level2-timer,
+  .level3-timer,
+  .level2-question,
+  .level3-question,
+  .level2-counter,
+  .level3-counter {
+    color: #ffffff !important; /* 白文字 */
+  }
+
+  .level2-timer.help-active,
+  .level3-timer.help-active {
+    color: #ff6b6b !important; /* 明るい赤 */
+  }
+
+  .level2-input,
+  .level3-input {
+    border: 1px solid #666666 !important;
+    background-color: #2d2d30 !important;
+    color: #ffffff !important;
+  }
+
+  .level2-input-disabled,
+  .level3-input-disabled {
+    background-color: #555555 !important;
+    color: #cccccc !important;
+  }
+
+  .level2-input::placeholder,
+  .level3-input::placeholder {
+    color: #aaaaaa !important;
+  }
+}
+
+/* Level2とLevel3共通の入力欄スタイル */
+.level2-input,
+.level3-input {
+  border: 1px solid #666666;
+  background-color: #2d2d30;
+  color: #ffffff;
+}
+
+/* Level2とLevel3共通の入力欄（無効時）のスタイル */
+.level2-input-disabled,
+.level3-input-disabled {
+  background-color: #555555;
+  color: #cccccc;
+}
+
+/* Level2とLevel3共通の入力欄のプレースホルダー */
+.level2-input::placeholder,
+.level3-input::placeholder {
+  color: #aaaaaa;
+  opacity: 1;
+}
+
+.level2-input::-webkit-input-placeholder,
+.level3-input::-webkit-input-placeholder {
+  color: #aaaaaa;
+}
+
+.level2-input::-moz-placeholder,
+.level3-input::-moz-placeholder {
+  color: #aaaaaa;
+  opacity: 1;
+}
+
+.level2-input:-ms-input-placeholder,
+.level3-input:-ms-input-placeholder {
+  color: #aaaaaa;
+}
+
+.level2-input:-moz-placeholder,
+.level3-input:-moz-placeholder {
+  color: #aaaaaa;
+  opacity: 1;
+}
+
+/* Level2とLevel3共通の入力欄のフォーカス時 */
+.level2-input:focus,
+.level3-input:focus {
+  border-color: #007acc;
+  box-shadow: 0 0 5px rgba(0, 122, 204, 0.5);
+}
+
+/* Level2とLevel3共通の入力欄のホバー時 */
+.level2-input:hover:not(.level2-input-disabled),
+.level3-input:hover:not(.level3-input-disabled) {
+  border-color: #888888;
+  transition: border-color 0.2s ease;
+}
+
+/* Level2とLevel3共通の時間表示スタイル */
+.level2-timer,
+.level3-timer {
+  color: #ffffff;
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+/* Level2とLevel3共通の時間表示（ヘルプ表示中）スタイル */
+.level2-timer.help-active,
+.level3-timer.help-active {
+  color: #ff6b6b;
+}
+
+/* Level2とLevel3共通の問題文スタイル */
+.level2-question,
+.level3-question {
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Level2とLevel3共通の問題カウンタースタイル */
+.level2-counter,
+.level3-counter {
+  color: #ffffff;
+  text-align: center;
+}
+
+/* レスポンシブデザイン用のスタイル - 横幅を広く調整 */
+.game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  padding: clamp(10px, 3vw, 20px);
+  box-sizing: border-box;
+  text-align: center;
+  width: 100%; /* 全幅を使用 */
+}
+
+.game-main-content {
+  width: 100%;
+  max-width: 800px; /* 600px から 800px に拡大 */
+  margin: clamp(10px, 2vw, 20px) auto;
+  padding: clamp(15px, 3vw, 20px);
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.game-question {
+  font-size: clamp(16px, 4vw, 24px);
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: clamp(15px, 3vw, 20px);
+  word-wrap: break-word;
+  line-height: 1.4;
+  max-width: none; /* 幅制限を解除 */
+}
+
+.game-input {
+  padding: clamp(8px, 2vw, 12px); /* パディングを少し増加 */
+  font-size: clamp(14px, 3vw, 18px);
+  width: clamp(120px, 30vw, 180px); /* 幅を拡大: 100px→120px, 150px→180px */
+  max-width: 250px; /* 最大幅も拡大: 200px→250px */
+  border-radius: 5px;
+  margin: clamp(5px, 1vw, 10px);
+  outline: none;
+  box-sizing: border-box;
+}
+
+.game-input-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(10px, 2vw, 15px);
+  margin-top: clamp(15px, 3vw, 20px);
+  width: 100%; /* 全幅を使用 */
+}
+
+.game-input-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(8px, 2vw, 15px); /* ギャップを拡大 */
+  width: 100%; /* 全幅を使用 */
+}
+
+.game-button {
+  padding: clamp(10px, 2vw, 12px) clamp(18px, 4vw, 25px); /* パディングを拡大 */
+  font-size: clamp(14px, 3vw, 18px);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: clamp(5px, 1vw, 10px);
+  min-width: clamp(70px, 18vw, 100px); /* 最小幅を拡大 */
+  transition: all 0.3s ease;
+}
+
+.game-retry-button {
+  margin-top: clamp(20px, 4vw, 30px);
+  padding: clamp(12px, 2vw, 15px) clamp(25px, 5vw, 35px);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: clamp(14px, 3vw, 16px);
+  border: 1px solid;
+  transition: all 0.3s ease;
+}
+
+/* ダークモード用のボタンスタイル */
+@media (prefers-color-scheme: dark) {
+  .game-retry-button {
+    background-color: #555555 !important;
+    color: #ffffff !important;
+    border-color: #666666 !important;
+  }
+
+  .game-retry-button:hover {
+    background-color: #666666 !important;
+    border-color: #777777 !important;
+  }
+
+  .game-retry-button:active {
+    background-color: #444444 !important;
+  }
+}
+
+/* ライトモード用のボタンスタイル */
+@media (prefers-color-scheme: light) {
+  .game-retry-button {
+    background-color: #f5f5f5 !important;
+    color: #000000 !important;
+    border-color: #cccccc !important;
+  }
+
+  .game-retry-button:hover {
+    background-color: #eeeeee !important;
+    border-color: #bbbbbb !important;
+  }
+
+  .game-retry-button:active {
+    background-color: #e0e0e0 !important;
+  }
+}
+
+/* その他のゲームボタンも同様に対応 */
+.game-button {
+  padding: clamp(10px, 2vw, 12px) clamp(18px, 4vw, 25px);
+  font-size: clamp(14px, 3vw, 18px);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: clamp(5px, 1vw, 10px);
+  min-width: clamp(70px, 18vw, 100px);
+  transition: all 0.3s ease;
+}
+
+/* 回答ボタン用のスタイル */
+.game-answer-button {
+  background-color: #4caf50 !important;
+  color: white !important;
+  border: none !important;
+}
+
+.game-answer-button:hover {
+  background-color: #45a049 !important;
+}
+
+.game-answer-button:active {
+  background-color: #3d8b40 !important;
+}
+
+/* HelpPopup内のタイマー用スタイル */
+.game-timer.level2-timer {
+  display: block;
+  margin: 0 0 15px 0;
+}
+
+.game-timer.level2-timer.help-active {
+  color: #ff6b35;
+}
+
+.game-timer.level2-timer.dark-theme {
+  color: #ffffff;
+  background-color: rgba(45, 45, 48, 0.9) !important;
+}
+
+.game-timer.level2-timer.light-theme {
+  color: #000000;
+  background-color: rgba(255, 255, 255, 0.9) !important;
 }
