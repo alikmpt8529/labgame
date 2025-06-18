@@ -8,7 +8,7 @@ import ResultPageD from './ResultPageD';
 
 const audio = new Audio('/audio/MusMus-BGM-147.mp3');
 audio.loop = true;
-audio.volume = 0.5;
+audio.volume = 0.25;
 let isAudioPlaying = false; // BGMが再生中かを管理する変数
 
 function HomeScreen(props) {
