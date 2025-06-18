@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
 import './App.css'
-import './animation.css' // アニメーションCSSをインポート
 //ここより下はアプリ内部の挙動を別スクリプトに分離するためのインポート部分
 import HomeScreen from './HomeScreen'; // HomeScreenコンポーネントをインポート
 import OriginalHelpPopup from './HelpPopup'; // HelpPopupコンポーネントをインポート（名前を変更）
@@ -23,9 +22,7 @@ function Level2Screen({
   showHelp,
   setShowHelp,
   onGoBack,
-  HelpPopup,
-  showFullscreenAnimation,
-  animationType
+  HelpPopup
 }) {
   // システムの色設定を検出
   const [isDarkMode, setIsDarkMode] = useState(
@@ -49,39 +46,14 @@ function Level2Screen({
     }
   };
 
-  // Level2用のキーボード入力処理を修正
+  // Level2用のキーボード入力処理
   const handleLevel2KeyDown = (e) => {
-    // ヘルプ表示中は入力を無効化
-    if (showHelp) {
-      e.preventDefault();
-      return;
+    if (e.key === 'Enter' && inputValue.trim() !== '') {
+      checkAnswer();
     }
-    
-    // アニメーション表示中は入力を無効化
-    if (showFullscreenAnimation) {
-      e.preventDefault();
-      return;
-    }
-    
-    // Enterキーでの回答送信
-    if (e.key === 'Enter') {
-      e.preventDefault(); // デフォルト動作を防止
-      if (inputValue.trim() !== '') {
-        checkAnswer();
-      }
-      return;
-    }
-    
-    // hキーでヘルプ表示
-    if (e.key === 'h' || e.key === 'H') {
-      e.preventDefault();
-      setShowHelp(true);
-      return;
-    }
-    
     // 数字、Backspace、Delete、Arrow keys、Tabのみ許可
     if (!/[\d]/.test(e.key) && 
-        !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)) {
+        !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter'].includes(e.key)) {
       e.preventDefault();
     }
   };
@@ -101,32 +73,6 @@ function Level2Screen({
     width: `${(progressTime / 60) * 100}%`,
     backgroundColor: progressTime > 10 ? '#4caf50' : '#f44336', 
     transition: 'width 0.1s linear' // Level3の滑らかな更新を維持
-  };
-
-  // 全画面アニメーションコンポーネント
-  const FullscreenAnimation = () => {
-    if (!showFullscreenAnimation) return null;
-    
-    return (
-      <div 
-        className={`fullscreen-animation-overlay ${isDarkMode ? 'dark' : ''}`}
-        onClick={() => {
-          // クリックでアニメーション終了は親コンポーネントで制御
-        }}
-      >
-        <div className="fullscreen-animation-content">
-          <div className={`fullscreen-circle ${animationType}`}>
-            {animationType === 'correct' ? '⚪︎' : '×'}
-          </div>
-          <div className={`fullscreen-text ${animationType}`}>
-            {animationType === 'correct' ? '正解！' : '不正解'}
-          </div>
-          <div className="fullscreen-hint">
-            クリックで閉じる
-          </div>
-        </div>
-      </div>
-    );
   };
 
   return (
@@ -159,9 +105,9 @@ function Level2Screen({
               onChange={handleLevel2InputChange}
               onKeyDown={handleLevel2KeyDown}
               placeholder="答えを入力" 
-              disabled={showHelp || showFullscreenAnimation} // アニメーション中も無効化
-              autoFocus={!showHelp && !showFullscreenAnimation}
-              className={`game-input level2-input ${showHelp || showFullscreenAnimation ? 'level2-input-disabled' : ''} ${isDarkMode ? 'dark-theme' : 'light-theme'}`}
+              disabled={showHelp}
+              autoFocus={!showHelp}
+              className={`game-input level2-input ${showHelp ? 'level2-input-disabled' : ''} ${isDarkMode ? 'dark-theme' : 'light-theme'}`}
             />
           </p>
           
@@ -176,31 +122,20 @@ function Level2Screen({
           </div>
           
           <div className="game-input-section">
-            <button 
-              onClick={checkAnswer}
-              disabled={showHelp || showFullscreenAnimation || inputValue.trim() === ''}
-              style={{
-                padding: '10px 20px',
-                fontSize: '16px',
-                backgroundColor: (showHelp || showFullscreenAnimation || inputValue.trim() === '') ? '#ccc' : '#4caf50',
-                color: 'white',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: (showHelp || showFullscreenAnimation || inputValue.trim() === '') ? 'not-allowed' : 'pointer',
-                marginBottom: '15px'
-              }}
-            >
-              回答する
-            </button>
-            
-            <div className="game-progress-container" style={progressBarContainerStyle}>
-              <div style={progressBarStyle}></div>
-            </div>
+            {result && (
+              <p className="game-result" style={{ 
+                color: result === '正解！' 
+                  ? (isDarkMode ? '#ff6b6b' : '#d32f2f')
+                  : (isDarkMode ? '#4dabf7' : '#1976d2')
+              }}>
+                {result}
+              </p>
+            )}
             
             <p className="game-hint" style={{ 
               color: isDarkMode ? '#cccccc' : '#666666'
             }}>
-              ヒント: hキーで表示 | Enterキーまたは回答ボタンで回答
+              ヒント: hキーで表示(Hint: Press the h key to display.) | Enterキーで回答(Press the Enter key to answer.)
             </p>
           </div>
         </div>
@@ -212,9 +147,6 @@ function Level2Screen({
           ホームに戻る(return to home)
         </button>
       </div>
-
-      {/* 全画面アニメーション */}
-      <FullscreenAnimation />
       
       {/* ポップアップを最前面に表示 */}
       {showHelp && HelpPopup && (
@@ -247,14 +179,6 @@ function App() {
 
   const [questionSequence, setQuestionSequence] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-
-  // 全画面アニメーション関連のstate
-  const [showFullscreenAnimation, setShowFullscreenAnimation] = useState(false);
-  const [animationType, setAnimationType] = useState('');
-
-  // 処理中フラグ
-  const [isProcessingAnswer, setIsProcessingAnswer] = useState(false);
-  const animationTimeoutRef = useRef(null);
 
   // 画面がlevel2に切り替わったタイミングでヒント表示＆レベル2設定
   useEffect(() => {
@@ -411,60 +335,28 @@ function App() {
 
   const answer = num4 * num5;
 
-  // 回答チェック処理を修正（Appコンポーネント内）
   const checkAnswer = () => {
-    console.log('checkAnswer called'); // デバッグ用
-    console.log('num4:', num4, 'num5:', num5, 'inputValue:', inputValue); // デバッグ用
-    
-    if (inputValue.trim() === '') {
-      console.log('Empty input'); // デバッグ用
-      return;
-    }
-    
-    // アニメーション表示中は処理しない
-    if (showFullscreenAnimation) {
-      console.log('Animation in progress'); // デバッグ用
-      return;
-    }
-    
-    const userAnswer = parseInt(inputValue, 10);
-    const correctAnswer = num4 * num5;
-    
-    console.log('User answer:', userAnswer, 'Correct answer:', correctAnswer); // デバッグ用
-    
-    if (userAnswer === correctAnswer) {
-      console.log('Correct answer!'); // デバッグ用
-      setResult('正解！')
-      setShowFullscreenAnimation(true);
-      setAnimationType('correct');
+    if (parseInt(inputValue, 10) === answer) {
+      setResult('⚪︎　正解！')
       const nextQuestionIndex = currentQuestionIndex + 1;
       setTimeSpent(timeSpent + (60 - timeRemaining));
       setCount(nextQuestionIndex);
 
       if (nextQuestionIndex >= questionSequence.length) {
         setTimeout(() => {
-          setShowFullscreenAnimation(false);
           alert('クリア時間' + Math.round(timeSpent + (60 - timeRemaining)) + '秒\nRANK A : ~45秒\nRANK B : ~85秒\nRANK C : ~125秒\nRANK D : 126秒~');
           if (Math.round(timeSpent + (60 - timeRemaining)) < 46) setScreen('result');
           else if (Math.round(timeSpent + (60 - timeRemaining)) < 86) setScreen('resultB');
           else if (Math.round(timeSpent + (60 - timeRemaining)) < 126) setScreen('resultC');
           else setScreen('resultD')
-        }, 1500)
+        }, 1000)
       } else {
         setTimeout(() => {
-          setShowFullscreenAnimation(false);
           setCurrentQuestionIndex(nextQuestionIndex);
-        }, 1500)
+        }, 1000)
       }
     } else {
-      console.log('Incorrect answer!'); // デバッグ用
-      setResult('不正解')
-      setShowFullscreenAnimation(true);
-      setAnimationType('incorrect');
-      
-      setTimeout(() => {
-        setShowFullscreenAnimation(false);
-      }, 1000)
+      setResult('× 不正解')
     }
   }
 
@@ -500,8 +392,6 @@ function App() {
         setShowHelp={setShowHelp}
         onGoBack={() => handleNavigation('home')}
         HelpPopup={OriginalHelpPopup}
-        showFullscreenAnimation={showFullscreenAnimation}
-        animationType={animationType}
       />
     );
   }
