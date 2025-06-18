@@ -6,7 +6,7 @@ import ResultPageB from './ResultPageB';
 import ResultPageC from './ResultPageC';
 import ResultPageD from './ResultPageD';
 
-const audio = new Audio('/audio/MusMus-BGM-147.mp3');
+const audio = new Audio('/audio/MusMus-BGM-141.mp3');
 audio.loop = true;
 audio.volume = 0.5;
 let isAudioPlaying = false; // BGMが再生中かを管理する変数
@@ -64,8 +64,6 @@ function HomeScreen(props) {
     return (
       <div style={{ textAlign: 'center', marginTop: '100px' }}>
         <h1>インド式計算ゲーム</h1>
-        <h2>レベルを選択してください</h2>
-        <p>select level</p>
         <button onClick={() => handleNavigate('level1')} style={{ margin: '10px', padding: '10px 20px', fontSize: '16px' }}>
           Level 1
         </button>
